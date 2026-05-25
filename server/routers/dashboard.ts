@@ -108,6 +108,9 @@ export const dashboardRouter = router({
       }
     }
 
+    // Mapear memberId → createdAt do titular para filhos
+    const memberCreatedAtMap = new Map(allMembers.map((m) => [m.id, m.createdAt]));
+
     // Filhos herdam tipo do titular
     let totalChildren = 0;
     for (const child of allChildren) {
@@ -115,6 +118,21 @@ export const dashboardRouter = router({
       const type = memberTypeMap.get(child.memberId) ?? "visitante";
       typeCounts[type] = (typeCounts[type] ?? 0) + 1;
       if (child.isBaptized) totalBaptized++;
+
+      // Filho conta como novo no mesmo mês do cadastro do titular
+      const parentCreatedAt = memberCreatedAtMap.get(child.memberId);
+      if (parentCreatedAt) {
+        const d = new Date(parentCreatedAt);
+        if (d.getFullYear() === thisYear && d.getMonth() + 1 === thisMonth) {
+          newThisMonth++;
+        }
+        if (
+          d.getFullYear() === lastMonth.getFullYear() &&
+          d.getMonth() + 1 === lastMonth.getMonth() + 1
+        ) {
+          newLastMonth++;
+        }
+      }
     }
 
     const totalPeople = totalMembersOnly + totalSpouses + totalChildren;
@@ -181,15 +199,25 @@ export const dashboardRouter = router({
     const db = await getDb();
     if (!db) return [];
 
-    // Buscar membros com congregação
     const memberRows = await db
       .select({
+        id: members.id,
         congregation: members.congregation,
         spouseName: members.spouseName,
-        childrenCount: sql<number>`(SELECT COUNT(*) FROM member_children mc WHERE mc.memberId = ${members.id})`,
       })
       .from(members)
       .where(and(eq(members.isActive, true)));
+
+    // Buscar todos os filhos com o memberId
+    const childRows = await db
+      .select({ memberId: memberChildren.memberId })
+      .from(memberChildren);
+
+    // Mapear memberId -> número de filhos
+    const childCountByMember = new Map<number, number>();
+    for (const c of childRows) {
+      childCountByMember.set(c.memberId, (childCountByMember.get(c.memberId) ?? 0) + 1);
+    }
 
     const counts: Record<string, number> = {};
     for (const row of memberRows) {
@@ -201,10 +229,8 @@ export const dashboardRouter = router({
         counts[cong] = (counts[cong] ?? 0) + 1;
       }
       // Filhos herdam congregação
-      const childCount = Number(row.childrenCount ?? 0);
-      if (childCount > 0) {
-        counts[cong] = (counts[cong] ?? 0) + childCount;
-      }
+      const childCount = childCountByMember.get(row.id) ?? 0;
+      counts[cong] = (counts[cong] ?? 0) + childCount;
     }
 
     return Object.entries(counts)
@@ -325,9 +351,9 @@ export const dashboardRouter = router({
 
     const rows = await db
       .select({
+        id: members.id,
         createdAt: members.createdAt,
         spouseName: members.spouseName,
-        childrenCount: sql<number>`(SELECT COUNT(*) FROM member_children mc WHERE mc.memberId = ${members.id})`,
       })
       .from(members)
       .where(
@@ -336,6 +362,16 @@ export const dashboardRouter = router({
           sql`${members.createdAt} >= ${cutoff.toISOString().slice(0, 10)}`
         )
       );
+
+    // Buscar todos os filhos com o memberId
+    const childRows = await db
+      .select({ memberId: memberChildren.memberId })
+      .from(memberChildren);
+
+    const childCountByMember = new Map<number, number>();
+    for (const c of childRows) {
+      childCountByMember.set(c.memberId, (childCountByMember.get(c.memberId) ?? 0) + 1);
+    }
 
     const counts: Record<string, number> = {};
     for (const row of rows) {
@@ -349,10 +385,8 @@ export const dashboardRouter = router({
         counts[key] = (counts[key] ?? 0) + 1;
       }
       // Filhos
-      const childCount = Number(row.childrenCount ?? 0);
-      if (childCount > 0) {
-        counts[key] = (counts[key] ?? 0) + childCount;
-      }
+      const childCount = childCountByMember.get(row.id) ?? 0;
+      counts[key] = (counts[key] ?? 0) + childCount;
     }
 
     return Object.entries(counts)
