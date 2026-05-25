@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ClipboardList, LayoutDashboard, Users, Heart, BookOpen, Shield, ArrowRight } from "lucide-react";
 
-const LOGO_URL = "/manus-storage/pibb_logo_ca76fb8b.png";
+const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
 
 export default function Home() {
   return (

@@ -17,7 +17,7 @@ const loginSchema = z.object({
 });
 type LoginForm = z.infer<typeof loginSchema>;
 
-const LOGO_URL = "/manus-storage/pasted_file_5gguH2_image_1748199494.png";
+const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();

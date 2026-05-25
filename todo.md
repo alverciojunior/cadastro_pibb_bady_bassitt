@@ -58,7 +58,7 @@
 - [x] Navegação intuitiva para idosos
 - [x] Feedback visual claro em cada ação
 
-## Melhorias Futuras (backlog)
+## Melhorias Futuras (backlog - opcionais)
 - [ ] Exportação de relatórios em PDF/Excel
 - [ ] Integração com WhatsApp Business API para mensagens automáticas
 - [ ] Importação em massa via planilha

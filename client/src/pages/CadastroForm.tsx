@@ -53,7 +53,7 @@ type FormData = {
   children: { fullName: string; birthDate: string }[];
 };
 
-const LOGO_URL = "/manus-storage/pibb_logo_ca76fb8b.png";
+const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
 
 const CONGREGATIONS = [
   "Sede - Bady Bassitt",
