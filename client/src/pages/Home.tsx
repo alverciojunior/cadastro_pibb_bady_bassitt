@@ -31,7 +31,7 @@ export default function Home() {
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
               >
                 <Shield size={16} />
-                <span className="hidden sm:inline">Liderança</span>
+                <span className="hidden sm:inline">Painel de Gestão</span>
               </Button>
             </Link>
           </div>
