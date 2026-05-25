@@ -20,10 +20,12 @@ function isSecureRequest(req: any): boolean {
 }
 
 function getAdminCookieOptions(req: any) {
+  const secure = isSecureRequest(req);
   return {
     httpOnly: true,
-    secure: isSecureRequest(req),
-    sameSite: "none" as const,
+    secure,
+    // sameSite=none requer secure=true; em HTTP local usa lax
+    sameSite: (secure ? "none" : "lax") as "none" | "lax",
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   };
