@@ -60,11 +60,11 @@
 
 ## Melhorias Futuras (backlog - opcionais)
 - [ ] Exportação de relatórios em PDF/Excel
-- [ ] Integração com WhatsApp Business API para mensagens automáticas
+- [x] Integração com WhatsApp Business API para mensagens automáticas
 - [ ] Importação em massa via planilha
 - [ ] Histórico de alterações por membro
 - [ ] Módulo de frequência em cultos
-- [ ] Notificações de aniversariantes automáticas
+- [x] Notificações de aniversariantes automáticas
 
 ## WhatsApp e Notificações (Evolution API)
 - [x] Tabela `whatsapp_config` para armazenar URL, API key e status da conexão
