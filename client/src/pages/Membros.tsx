@@ -17,8 +17,8 @@ import { toast } from "sonner";
 const MEMBER_TYPE_LABELS: Record<string, string> = {
   membro_ativo: "Família Ativa",
   frequentante: "Família Frequentante",
-  visitante: "Visitante",
-  afastado: "Afastado",
+  visitante: "Família Visitante",
+  afastado: "Família Afastada",
 };
 
 const MEMBER_TYPE_COLORS: Record<string, string> = {
@@ -101,8 +101,8 @@ export default function Membros() {
                   <SelectItem value="all">Todas as situações</SelectItem>
                   <SelectItem value="membro_ativo">Família Ativa</SelectItem>
                   <SelectItem value="frequentante">Família Frequentante</SelectItem>
-                  <SelectItem value="visitante">Visitante</SelectItem>
-                  <SelectItem value="afastado">Afastado</SelectItem>
+                  <SelectItem value="visitante">Família Visitante</SelectItem>
+                  <SelectItem value="afastado">Família Afastada</SelectItem>
                 </SelectContent>
               </Select>
 
