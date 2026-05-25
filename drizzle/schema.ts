@@ -26,6 +26,26 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+// WhatsApp configuration table
+export const whatsappConfig = mysqlTable("whatsapp_config", {
+  id: int("id").autoincrement().primaryKey(),
+  evolutionApiUrl: varchar("evolutionApiUrl", { length: 512 }).notNull(),
+  evolutionApiKey: varchar("evolutionApiKey", { length: 256 }).notNull(),
+  instanceName: varchar("instanceName", { length: 128 }).notNull().default("pibb"),
+  isConnected: boolean("isConnected").notNull().default(false),
+  welcomeMessageEnabled: boolean("welcomeMessageEnabled").notNull().default(true),
+  birthdayMessageEnabled: boolean("birthdayMessageEnabled").notNull().default(true),
+  birthdayCronTaskUid: varchar("birthdayCronTaskUid", { length: 65 }),
+  welcomeMessage: text("welcomeMessage"),
+  birthdayMessage: text("birthdayMessage"),
+  leadershipPhone: varchar("leadershipPhone", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WhatsappConfig = typeof whatsappConfig.$inferSelect;
+export type InsertWhatsappConfig = typeof whatsappConfig.$inferInsert;
+
 // ─── Families ────────────────────────────────────────────────────────────────
 export const families = mysqlTable("families", {
   id: int("id").autoincrement().primaryKey(),

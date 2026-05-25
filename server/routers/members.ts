@@ -7,6 +7,7 @@ import { eq, or, and, like, desc, sql, ne } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { notifyOwner } from "../_core/notification";
 import { invokeLLM } from "../_core/llm";
+import { sendWhatsAppMessage } from "./whatsapp";
 
 // ─── Zod Schemas ─────────────────────────────────────────────────────────────
 
@@ -213,6 +214,29 @@ export const membersRouter = router({
       content: `Um novo cadastro foi realizado na plataforma PIB Bady Bassitt.\n\n• Nome: ${input.fullName}\n• Telefone: ${input.phone || "—"}\n• Congregação: ${input.congregation || "—"}\n• Ministério: ${input.ministry || "—"}\n• Classificação: ${memberType.replace("_", " ")}${spouseInfo}${childrenInfo}\n\n${isDuplicate ? "⚠️ ATENÇÃO: Possível duplicidade detectada (CPF ou telefone já cadastrado)." : ""}`,
     });
 
+    // Enviar mensagem de boas-vindas via WhatsApp (não bloqueia o cadastro)
+    // Respeita configuração welcomeMessageEnabled e mensagem personalizada
+    const phoneForWA = input.whatsapp || input.phone;
+    if (phoneForWA) {
+      (async () => {
+        try {
+          const { whatsappConfig } = await import("../../drizzle/schema");
+          const dbInner = await getDb();
+          if (!dbInner) return;
+          const configs = await dbInner.select().from(whatsappConfig).limit(1);
+          const waCfg = configs[0];
+          if (!waCfg || !waCfg.isConnected || !waCfg.welcomeMessageEnabled) return;
+          const firstName = input.fullName.split(" ")[0];
+          const welcomeMsg = waCfg.welcomeMessage
+            ? waCfg.welcomeMessage.replace("{nome}", firstName).replace("{name}", firstName)
+            : `Olá, *${firstName}*! 😊\n\nSeu cadastro na *PIB Bady Bassitt* foi realizado com sucesso! 🙏\n\nEstamos muito felizes em ter você registrado(a) em nossa família. Que Deus abençoe sua vida!\n\n_PIB Bady Bassitt_`;
+          await sendWhatsAppMessage(phoneForWA, welcomeMsg);
+        } catch (err) {
+          console.error("[WhatsApp] Erro ao enviar boas-vindas:", err);
+        }
+      })();
+    }
+
     return { success: true, memberId: newMember.id, familyCode, memberType, isDuplicate };
   }),
 
@@ -292,6 +316,27 @@ export const membersRouter = router({
         title: `Cadastro atualizado: ${input.data.fullName}`,
         content: `O membro ${input.data.fullName} atualizou seus dados cadastrais.\n\n• Congregação: ${input.data.congregation || "—"}\n• Ministério: ${input.data.ministry || "—"}\n• Classificação: ${memberType.replace("_", " ")}`,
       });
+
+      // Notificar membro via WhatsApp sobre atualização
+      // Respeita configuração isConnected e welcomeMessageEnabled
+      const phoneForWA = input.data.whatsapp || input.data.phone;
+      if (phoneForWA) {
+        (async () => {
+          try {
+            const { whatsappConfig } = await import("../../drizzle/schema");
+            const dbInner = await getDb();
+            if (!dbInner) return;
+            const configs = await dbInner.select().from(whatsappConfig).limit(1);
+            const waCfg = configs[0];
+            if (!waCfg || !waCfg.isConnected || !waCfg.welcomeMessageEnabled) return;
+            const firstName = input.data.fullName.split(" ")[0];
+            const updateMsg = `Olá, *${firstName}*! 🙏\n\nSeu cadastro na *PIB Bady Bassitt* foi atualizado com sucesso!\n\nSe precisar de algo, estamos à disposição.\n\n_PIB Bady Bassitt_`;
+            await sendWhatsAppMessage(phoneForWA, updateMsg);
+          } catch (err) {
+            console.error("[WhatsApp] Erro ao enviar notificação de atualização:", err);
+          }
+        })();
+      }
 
       return { success: true, memberType, isDuplicate };
     }),

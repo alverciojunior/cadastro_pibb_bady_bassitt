@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { birthdayNotificationsHandler } from "../handlers/birthdayNotifications";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -36,6 +37,8 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Scheduled endpoints (cron heartbeat)
+  app.post("/api/scheduled/birthday-notifications", birthdayNotificationsHandler);
   // tRPC API
   app.use(
     "/api/trpc",

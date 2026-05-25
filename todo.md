@@ -65,3 +65,13 @@
 - [ ] Histórico de alterações por membro
 - [ ] Módulo de frequência em cultos
 - [ ] Notificações de aniversariantes automáticas
+
+## WhatsApp e Notificações (Evolution API)
+- [x] Tabela `whatsapp_config` para armazenar URL, API key e status da conexão
+- [x] Router tRPC: salvar/atualizar configuração do Evolution API
+- [x] Router tRPC: enviar mensagem de teste
+- [x] Integração: envio automático de mensagem de boas-vindas ao criar membro
+- [x] Integração: envio automático de mensagem ao atualizar cadastro
+- [x] Heartbeat cron diário: notificação de aniversáriantes para a liderança
+- [x] Endpoint /api/scheduled/birthday-notifications para o cron
+- [x] Página de configuração WhatsApp no painel administrativo
