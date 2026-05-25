@@ -14,8 +14,7 @@ import { ChevronLeft, Save, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
 const CONGREGATIONS = [
-  "Sede - Bady Bassitt", "Congregação Norte", "Congregação Sul",
-  "Congregação Leste", "Congregação Oeste", "Outra",
+  "Sede - Bady Bassitt",
 ];
 const MINISTRIES = [
   "Louvor e Adoração", "Ensino Bíblico", "Evangelismo", "Diaconia",

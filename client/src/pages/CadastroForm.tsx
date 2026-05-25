@@ -59,11 +59,6 @@ const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
 
 const CONGREGATIONS = [
   "Sede - Bady Bassitt",
-  "Congregação Norte",
-  "Congregação Sul",
-  "Congregação Leste",
-  "Congregação Oeste",
-  "Outra",
 ];
 
 const MINISTRIES = [
