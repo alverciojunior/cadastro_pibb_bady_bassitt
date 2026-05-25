@@ -88,7 +88,7 @@ export default function MembroEditar() {
         spouseBaptismDate: formatDate(member.spouseBaptismDate),
         spouseMinistry: member.spouseMinistry || "",
         spouseServiceArea: member.spouseServiceArea || "",
-        spouseIsTither: member.spouseIsTither || "",
+        spouseIsTither: member.spouseIsTither || null,
         memberType: member.memberType || "visitante",
         pastoralNotes: member.pastoralNotes || "",
       });
@@ -126,6 +126,7 @@ export default function MembroEditar() {
         spouseBirthDate: formData.spouseBirthDate || null,
         email: formData.email || null,
         spouseEmail: formData.spouseEmail || null,
+        spouseIsTither: formData.spouseIsTither || null,
         children: children.filter((c) => c.fullName.trim()).map((c) => ({
           fullName: c.fullName,
           birthDate: c.birthDate || null,
