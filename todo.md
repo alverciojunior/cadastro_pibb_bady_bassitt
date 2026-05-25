@@ -109,3 +109,7 @@
 - [x] Formulário: exibir campo de data de batismo do cônjuge quando `spouseIsBaptized` for marcado
 - [x] Formulário: exibir flag "Batizado(a)?" e data de batismo para cada filho quando flag marcada
 - [x] Atualizar tela de detalhes do membro para exibir batismo do cônjuge e dos filhos
+
+## Busca por Nome do Cônjuge
+- [x] Estender a busca na página Membros para incluir nome do cônjuge
+- [x] Atualizar placeholder da barra de busca para indicar busca por titular/cônjuge

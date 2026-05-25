@@ -387,6 +387,7 @@ export const membersRouter = router({
         conditions.push(
           or(
             like(members.fullName, `%${input.search}%`),
+            like(members.spouseName, `%${input.search}%`),
             like(members.phone, `%${input.search}%`),
             like(members.cpf, `%${input.search}%`)
           ) as any

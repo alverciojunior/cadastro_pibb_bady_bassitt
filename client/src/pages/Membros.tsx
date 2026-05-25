@@ -86,7 +86,7 @@ export default function Membros() {
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
-                  placeholder="Buscar por nome, CPF ou telefone..."
+                  placeholder="Buscar por nome (titular/cônjuge), CPF ou telefone..."
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10 h-11"
