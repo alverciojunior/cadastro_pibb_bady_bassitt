@@ -61,12 +61,12 @@ export default function Home() {
         <div className="max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-secondary/20 text-secondary-foreground px-4 py-2 rounded-full text-sm font-medium mb-6 border border-secondary/30">
             <Heart size={14} className="text-secondary" />
-            Sistema de Recadastramento de Membros
+            Sistema de Gestão de Membros
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-primary mb-5 leading-tight">
             Bem-vindo(a) à<br />
-            <span className="gold-accent">PIBB Bady Bassitt</span>
+            <span className="gold-accent">PIB Bady Bassitt</span>
           </h2>
 
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
