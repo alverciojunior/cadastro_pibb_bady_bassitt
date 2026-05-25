@@ -987,12 +987,6 @@ function SuccessScreen({ data }: { data: any }) {
               <span className="text-muted-foreground">Código da Família</span>
               <span className="font-mono font-bold text-primary">{data?.familyCode}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-border">
-              <span className="text-muted-foreground">Classificação</span>
-              <span className="font-semibold">
-                {typeLabels[data?.memberType] || data?.memberType}
-              </span>
-            </div>
             {data?.isDuplicate && (
               <div className="flex gap-2 items-start py-2 text-amber-700">
                 <AlertCircle size={18} className="mt-0.5 shrink-0" />
