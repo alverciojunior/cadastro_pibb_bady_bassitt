@@ -96,8 +96,9 @@ export default function Dashboard() {
         {/* KPIs Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard
-            title="Total de Membros"
+            title="Total de Pessoas"
             value={kpis?.totalMembers}
+            subtitle={kpis ? `${kpis.totalMembersOnly} titulares · ${kpis.totalSpouses} cônjuges · ${kpis.totalChildren} filhos` : undefined}
             icon={<Users className="text-primary" size={24} />}
             loading={kpisLoading}
             color="bg-blue-50"
@@ -315,9 +316,9 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {birthdays.map((b) => (
+                {birthdays.map((b, idx) => (
                   <div
-                    key={b.id}
+                    key={`${b.type}-${b.id}-${idx}`}
                     className="flex items-center gap-3 p-3 bg-pink-50 rounded-xl border border-pink-100"
                   >
                     <div className="w-10 h-10 bg-pink-200 rounded-full flex items-center justify-center text-pink-700 font-bold text-sm">
@@ -325,9 +326,20 @@ export default function Dashboard() {
                         ? new Date(b.birthDate).getDate().toString().padStart(2, "0")
                         : "?"}
                     </div>
-                    <div>
-                      <p className="font-semibold text-sm">{b.fullName}</p>
-                      <p className="text-xs text-muted-foreground">{b.phone || b.whatsapp || "—"}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{b.fullName}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                          b.type === 'membro' ? 'bg-blue-100 text-blue-700' :
+                          b.type === 'conjuge' ? 'bg-purple-100 text-purple-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {b.type === 'membro' ? 'Titular' : b.type === 'conjuge' ? 'Cônjuge' : 'Filho(a)'}
+                        </span>
+                        {(b.phone || b.whatsapp) && (
+                          <p className="text-xs text-muted-foreground">{b.phone || b.whatsapp}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -379,10 +391,8 @@ function KpiCard({
         ) : (
           <p className="text-3xl font-bold text-foreground">{value ?? 0}</p>
         )}
-        <p className="text-sm text-muted-foreground font-medium">
-          {title}
-          {subtitle && <span className="text-xs ml-1">({subtitle})</span>}
-        </p>
+        <p className="text-sm text-muted-foreground font-medium">{title}</p>
+        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
       </CardContent>
     </Card>
   );
