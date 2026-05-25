@@ -70,7 +70,10 @@ function PasswordInput({ id, placeholder, ...props }: React.InputHTMLAttributes<
 
 export default function AdminUsuarios() {
   const utils = trpc.useUtils();
-  const { data: admins, isLoading } = trpc.adminAuth.listAdmins.useQuery();
+  const { data: adminSession } = trpc.adminAuth.me.useQuery(undefined, { retry: false });
+  const { data: admins, isLoading } = trpc.adminAuth.listAdmins.useQuery(undefined, {
+    enabled: !!adminSession,
+  });
 
   // Estado dos modais
   const [showCreate, setShowCreate] = useState(false);
