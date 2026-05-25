@@ -46,11 +46,12 @@ type FormData = {
   spouseWhatsapp: string;
   spouseEmail: string;
   spouseIsBaptized: boolean;
+  spouseBaptismDate: string;
   spouseMinistry: string;
   spouseServiceArea: string;
   hasChildren: string;
   childrenCount: string;
-  children: { fullName: string; birthDate: string }[];
+  children: { fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[];
 };
 
 const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
@@ -108,11 +109,12 @@ export default function CadastroForm() {
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [submitted, setSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
-  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string }[]>([]);
+  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[]>([]);
 
   const [formData, setFormData] = useState<Partial<FormData>>({
     isBaptized: false,
     spouseIsBaptized: false,
+    spouseBaptismDate: "",
     hasChildren: "nao",
     childrenCount: "1",
     children: [],
@@ -148,11 +150,13 @@ export default function CadastroForm() {
     const newChildren = Array.from({ length: num }, (_, i) => ({
       fullName: childrenFields[i]?.fullName || "",
       birthDate: childrenFields[i]?.birthDate || "",
+      isBaptized: childrenFields[i]?.isBaptized ?? false,
+      baptismDate: childrenFields[i]?.baptismDate || "",
     }));
     setChildrenFields(newChildren);
   };
 
-  const updateChild = (index: number, field: "fullName" | "birthDate", value: string) => {
+  const updateChild = (index: number, field: "fullName" | "birthDate" | "isBaptized" | "baptismDate", value: string | boolean) => {
     const updated = [...childrenFields];
     updated[index] = { ...updated[index], [field]: value };
     setChildrenFields(updated);
@@ -205,9 +209,17 @@ export default function CadastroForm() {
       spouseWhatsapp: showSpouseSection ? formData.spouseWhatsapp || null : null,
       spouseEmail: showSpouseSection ? formData.spouseEmail || null : null,
       spouseIsBaptized: showSpouseSection ? formData.spouseIsBaptized ?? false : false,
+      spouseBaptismDate: showSpouseSection && formData.spouseIsBaptized ? formData.spouseBaptismDate || null : null,
       spouseMinistry: showSpouseSection ? formData.spouseMinistry || null : null,
       spouseServiceArea: showSpouseSection ? formData.spouseServiceArea || null : null,
-      children: showChildrenSection ? childrenFields.filter((c) => c.fullName.trim()) : [],
+      children: showChildrenSection
+        ? childrenFields.filter((c) => c.fullName.trim()).map((c) => ({
+            fullName: c.fullName,
+            birthDate: c.birthDate || null,
+            isBaptized: c.isBaptized ?? false,
+            baptismDate: c.isBaptized ? c.baptismDate || null : null,
+          }))
+        : [],
     };
 
     createMember.mutate(payload);
@@ -754,6 +766,17 @@ function Step4({
               </label>
             </div>
 
+            {formData.spouseIsBaptized && (
+              <FormField label="Data do Batismo do Cônjuge">
+                <Input
+                  type="date"
+                  value={formData.spouseBaptismDate || ""}
+                  onChange={(e) => updateField("spouseBaptismDate", e.target.value)}
+                  className="h-12 text-base"
+                />
+              </FormField>
+            )}
+
             <FormField label="Ministério do Cônjuge">
               <Select
                 value={formData.spouseMinistry || ""}
@@ -850,6 +873,29 @@ function Step4({
                     className="h-12 text-base"
                   />
                 </FormField>
+
+                <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-blue-200">
+                  <Checkbox
+                    id={`child-baptized-${idx}`}
+                    checked={child.isBaptized ?? false}
+                    onCheckedChange={(v) => updateChild(idx, "isBaptized", v as boolean)}
+                    className="w-5 h-5"
+                  />
+                  <label htmlFor={`child-baptized-${idx}`} className="text-sm font-medium cursor-pointer">
+                    Batizado(a) nas águas
+                  </label>
+                </div>
+
+                {child.isBaptized && (
+                  <FormField label="Data do Batismo">
+                    <Input
+                      type="date"
+                      value={child.baptismDate || ""}
+                      onChange={(e) => updateChild(idx, "baptismDate", e.target.value)}
+                      className="h-12 text-base"
+                    />
+                  </FormField>
+                )}
               </div>
             ))}
           </div>

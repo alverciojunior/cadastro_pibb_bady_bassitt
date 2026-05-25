@@ -51,7 +51,7 @@ export default function MembroEditar() {
   });
 
   const [formData, setFormData] = useState<any>({});
-  const [children, setChildren] = useState<{ fullName: string; birthDate: string }[]>([]);
+  const [children, setChildren] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[]>([]);
 
   useEffect(() => {
     if (member) {
@@ -86,6 +86,7 @@ export default function MembroEditar() {
         spouseWhatsapp: member.spouseWhatsapp || "",
         spouseEmail: member.spouseEmail || "",
         spouseIsBaptized: member.spouseIsBaptized ?? false,
+        spouseBaptismDate: formatDate(member.spouseBaptismDate),
         spouseMinistry: member.spouseMinistry || "",
         spouseServiceArea: member.spouseServiceArea || "",
         memberType: member.memberType || "visitante",
@@ -95,6 +96,8 @@ export default function MembroEditar() {
         (member.children || []).map((c: any) => ({
           fullName: c.fullName || "",
           birthDate: c.birthDate ? new Date(c.birthDate).toISOString().split("T")[0] : "",
+          isBaptized: c.isBaptized ?? false,
+          baptismDate: c.baptismDate ? new Date(c.baptismDate).toISOString().split("T")[0] : "",
         }))
       );
     }
@@ -122,7 +125,12 @@ export default function MembroEditar() {
         spouseBirthDate: formData.spouseBirthDate || null,
         email: formData.email || null,
         spouseEmail: formData.spouseEmail || null,
-        children: children.filter((c) => c.fullName.trim()),
+        children: children.filter((c) => c.fullName.trim()).map((c) => ({
+          fullName: c.fullName,
+          birthDate: c.birthDate || null,
+          isBaptized: c.isBaptized ?? false,
+          baptismDate: c.isBaptized ? c.baptismDate || null : null,
+        })),
       },
     });
   };
@@ -322,6 +330,15 @@ export default function MembroEditar() {
               <FormField label="Telefone">
                 <Input value={formData.spousePhone || ""} onChange={(e) => set("spousePhone", e.target.value)} className="h-11" />
               </FormField>
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <Checkbox id="spouseIsBaptized" checked={formData.spouseIsBaptized ?? false} onCheckedChange={(v) => set("spouseIsBaptized", v)} className="w-5 h-5" />
+                <label htmlFor="spouseIsBaptized" className="font-medium cursor-pointer text-sm">Cônjuge batizado(a)</label>
+              </div>
+              {formData.spouseIsBaptized && (
+                <FormField label="Data do Batismo do Cônjuge">
+                  <Input type="date" value={formData.spouseBaptismDate || ""} onChange={(e) => set("spouseBaptismDate", e.target.value)} className="h-11" />
+                </FormField>
+              )}
               <FormField label="Ministério">
                 <Select value={formData.spouseMinistry || ""} onValueChange={(v) => set("spouseMinistry", v)}>
                   <SelectTrigger className="h-11"><SelectValue placeholder="Selecione..." /></SelectTrigger>
@@ -339,7 +356,7 @@ export default function MembroEditar() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setChildren([...children, { fullName: "", birthDate: "" }])}
+              onClick={() => setChildren([...children, { fullName: "", birthDate: "", isBaptized: false, baptismDate: "" }])}
             >
               + Adicionar Filho
             </Button>
@@ -383,6 +400,33 @@ export default function MembroEditar() {
                     className="h-11"
                   />
                 </FormField>
+                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200">
+                  <Checkbox
+                    id={`child-baptized-${idx}`}
+                    checked={child.isBaptized ?? false}
+                    onCheckedChange={(v) => {
+                      const updated = [...children];
+                      updated[idx] = { ...updated[idx], isBaptized: v as boolean };
+                      setChildren(updated);
+                    }}
+                    className="w-5 h-5"
+                  />
+                  <label htmlFor={`child-baptized-${idx}`} className="text-sm font-medium cursor-pointer">Batizado(a) nas águas</label>
+                </div>
+                {child.isBaptized && (
+                  <FormField label="Data do Batismo">
+                    <Input
+                      type="date"
+                      value={child.baptismDate || ""}
+                      onChange={(e) => {
+                        const updated = [...children];
+                        updated[idx] = { ...updated[idx], baptismDate: e.target.value };
+                        setChildren(updated);
+                      }}
+                      className="h-11"
+                    />
+                  </FormField>
+                )}
               </div>
             ))
           )}

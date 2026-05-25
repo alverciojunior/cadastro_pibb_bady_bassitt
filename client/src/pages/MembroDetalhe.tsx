@@ -237,7 +237,7 @@ export default function MembroDetalhe() {
               <InfoRow label="Telefone" value={member.spousePhone} />
               <InfoRow label="WhatsApp" value={member.spouseWhatsapp} />
               <InfoRow label="Ministério" value={member.spouseMinistry} />
-              <InfoRow label="Batizado(a)" value={member.spouseIsBaptized ? "Sim" : "Não"} />
+              <InfoRow label="Batizado(a)" value={member.spouseIsBaptized ? `Sim${member.spouseBaptismDate ? ` (${formatDate(member.spouseBaptismDate)})` : ""}` : "Não"} />
             </CardContent>
           </Card>
         )}
@@ -265,6 +265,11 @@ export default function MembroDetalhe() {
                           {formatDate(child.birthDate)}
                         </p>
                       )}
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {child.isBaptized
+                          ? `Batizado(a)${child.baptismDate ? ` em ${formatDate(child.baptismDate)}` : ""}`
+                          : "Não batizado(a)"}
+                      </p>
                     </div>
                   </div>
                 ))}

@@ -15,6 +15,13 @@
       "when": 1779731972232,
       "tag": "0001_fancy_war_machine",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779738374286,
+      "tag": "0002_heavy_maddog",
+      "breakpoints": true
     }
   ]
 }

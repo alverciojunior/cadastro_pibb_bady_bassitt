@@ -102,3 +102,10 @@
 - [x] Router tRPC: ativar/desativar admin
 - [x] Página /admin/usuarios com lista de admins e formulários
 - [x] Item de menu "Usuários Admin" no sidebar
+
+## Campos de Batismo no Formulário
+- [x] Adicionar campo `spouseBaptismDate` no schema/banco para data de batismo do cônjuge
+- [x] Adicionar campos `isBaptized` e `baptismDate` na tabela `member_children`
+- [x] Formulário: exibir campo de data de batismo do cônjuge quando `spouseIsBaptized` for marcado
+- [x] Formulário: exibir flag "Batizado(a)?" e data de batismo para cada filho quando flag marcada
+- [x] Atualizar tela de detalhes do membro para exibir batismo do cônjuge e dos filhos

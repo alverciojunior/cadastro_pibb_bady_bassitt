@@ -128,6 +128,7 @@ export const members = mysqlTable("members", {
   spouseWhatsapp: varchar("spouseWhatsapp", { length: 20 }),
   spouseEmail: varchar("spouseEmail", { length: 320 }),
   spouseIsBaptized: boolean("spouseIsBaptized").default(false),
+  spouseBaptismDate: date("spouseBaptismDate"),
   spouseMinistry: varchar("spouseMinistry", { length: 100 }),
   spouseServiceArea: varchar("spouseServiceArea", { length: 255 }),
 
@@ -165,6 +166,8 @@ export const memberChildren = mysqlTable("member_children", {
   familyId: int("familyId").references(() => families.id),
   fullName: varchar("fullName", { length: 255 }).notNull(),
   birthDate: date("birthDate"),
+  isBaptized: boolean("isBaptized").default(false),
+  baptismDate: date("baptismDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

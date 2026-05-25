@@ -14,6 +14,8 @@ import { sendWhatsAppMessage } from "./whatsapp";
 const childSchema = z.object({
   fullName: z.string().min(2),
   birthDate: z.string().optional().nullable(),
+  isBaptized: z.boolean().optional().default(false),
+  baptismDate: z.string().optional().nullable(),
 });
 
 export const memberInputSchema = z.object({
@@ -61,6 +63,7 @@ export const memberInputSchema = z.object({
   spouseWhatsapp: z.string().optional().nullable(),
   spouseEmail: z.string().optional().nullable(),
   spouseIsBaptized: z.boolean().optional().default(false),
+  spouseBaptismDate: z.string().optional().nullable(),
   spouseMinistry: z.string().optional().nullable(),
   spouseServiceArea: z.string().optional().nullable(),
 
@@ -168,6 +171,7 @@ export const membersRouter = router({
       spouseWhatsapp: input.spouseWhatsapp ?? null,
       spouseEmail: input.spouseEmail ?? null,
       spouseIsBaptized: input.spouseIsBaptized ?? false,
+      spouseBaptismDate: input.spouseBaptismDate ? new Date(input.spouseBaptismDate) : null,
       spouseMinistry: input.spouseMinistry ?? null,
       spouseServiceArea: input.spouseServiceArea ?? null,
       memberType,
@@ -190,6 +194,8 @@ export const membersRouter = router({
           familyId: family.id,
           fullName: child.fullName,
           birthDate: child.birthDate ? new Date(child.birthDate) : null,
+          isBaptized: child.isBaptized ?? false,
+          baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
         });
       }
     }
@@ -286,6 +292,7 @@ export const membersRouter = router({
           spouseWhatsapp: input.data.spouseWhatsapp ?? null,
           spouseEmail: input.data.spouseEmail ?? null,
           spouseIsBaptized: input.data.spouseIsBaptized ?? false,
+          spouseBaptismDate: input.data.spouseBaptismDate ? new Date(input.data.spouseBaptismDate) : null,
           spouseMinistry: input.data.spouseMinistry ?? null,
           spouseServiceArea: input.data.spouseServiceArea ?? null,
           memberType: input.data.memberType ?? memberType,
@@ -305,6 +312,8 @@ export const membersRouter = router({
             familyId: member.familyId,
             fullName: child.fullName,
             birthDate: child.birthDate ? new Date(child.birthDate) : null,
+            isBaptized: child.isBaptized ?? false,
+            baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
           });
         }
       }
