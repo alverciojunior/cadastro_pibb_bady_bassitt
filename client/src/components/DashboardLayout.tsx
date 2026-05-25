@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, ClipboardList, Home, MessageCircle, History } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, ClipboardList, Home, MessageCircle, History, ShieldPlus } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,6 +32,7 @@ const menuItems = [
   { icon: ClipboardList, label: "Novo Cadastro", path: "/cadastro" },
   { icon: MessageCircle, label: "WhatsApp", path: "/whatsapp" },
   { icon: History, label: "Histórico WA", path: "/whatsapp/historico" },
+  { icon: ShieldPlus, label: "Cadastrar Usuário Admin", path: "/admin/usuarios" },
   { icon: Home, label: "Página Inicial", path: "/" },
 ];
 

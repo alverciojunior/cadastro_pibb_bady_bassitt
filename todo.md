@@ -94,3 +94,11 @@
 - [x] Proteção de todas as rotas do painel (/dashboard, /membros, /whatsapp, etc.)
 - [x] Botão "Painel Administrativo" na home redireciona para /admin/login
 - [x] Redirecionamento automático após login bem-sucedido
+
+## Gerenciamento de Usuários Administradores
+- [x] Router tRPC: listar admins
+- [x] Router tRPC: criar novo admin (username, nome, senha)
+- [x] Router tRPC: trocar senha de qualquer admin
+- [x] Router tRPC: ativar/desativar admin
+- [x] Página /admin/usuarios com lista de admins e formulários
+- [x] Item de menu "Usuários Admin" no sidebar

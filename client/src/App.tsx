@@ -14,6 +14,7 @@ import MembroDetalhe from "./pages/MembroDetalhe";
 import MembroEditar from "./pages/MembroEditar";
 import WhatsappConfig from "./pages/WhatsappConfig";
 import WhatsappHistorico from "./pages/WhatsappHistorico";
+import AdminUsuarios from "./pages/AdminUsuarios";
 
 // Wrapper para rotas protegidas pelo AdminGuard
 function ProtectedDashboard() {
@@ -34,6 +35,9 @@ function ProtectedWhatsappConfig() {
 function ProtectedWhatsappHistorico() {
   return <AdminGuard><WhatsappHistorico /></AdminGuard>;
 }
+function ProtectedAdminUsuarios() {
+  return <AdminGuard><AdminUsuarios /></AdminGuard>;
+}
 
 function Router() {
   return (
@@ -50,6 +54,7 @@ function Router() {
       <Route path="/membros/:id" component={ProtectedMembroDetalhe} />
       <Route path="/whatsapp" component={ProtectedWhatsappConfig} />
       <Route path="/whatsapp/historico" component={ProtectedWhatsappHistorico} />
+      <Route path="/admin/usuarios" component={ProtectedAdminUsuarios} />
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

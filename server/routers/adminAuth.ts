@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
+import { router, publicProcedure, pibbAdminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { adminUsers } from "../../drizzle/schema";
@@ -124,6 +124,78 @@ export const adminAuthRouter = router({
       const newHash = await bcrypt.hash(input.newPassword, 12);
       await db.update(adminUsers).set({ passwordHash: newHash }).where(eq(adminUsers.id, admin.id));
 
+      return { success: true };
+    }),
+
+  // Listar todos os admins (requer sessão admin)
+  listAdmins: pibbAdminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    const rows = await db.select({
+      id: adminUsers.id,
+      username: adminUsers.username,
+      name: adminUsers.name,
+      isActive: adminUsers.isActive,
+      createdAt: adminUsers.createdAt,
+      lastLoginAt: adminUsers.lastLoginAt,
+    }).from(adminUsers);
+    return rows;
+  }),
+
+  // Criar novo admin
+  createAdmin: pibbAdminProcedure
+    .input(z.object({
+      username: z.string().min(3, "Mínimo 3 caracteres").max(32),
+      name: z.string().min(2, "Mínimo 2 caracteres"),
+      password: z.string().min(6, "Mínimo 6 caracteres"),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const existing = await db.select({ id: adminUsers.id })
+        .from(adminUsers)
+        .where(eq(adminUsers.username, input.username.trim().toLowerCase()))
+        .limit(1);
+      if (existing.length > 0) {
+        throw new TRPCError({ code: "CONFLICT", message: "Nome de usuário já existe" });
+      }
+
+      const hash = await bcrypt.hash(input.password, 12);
+      await db.insert(adminUsers).values({
+        username: input.username.trim().toLowerCase(),
+        name: input.name.trim(),
+        passwordHash: hash,
+        isActive: true,
+      });
+      return { success: true };
+    }),
+
+  // Trocar senha de qualquer admin (pelo admin logado)
+  resetPassword: pibbAdminProcedure
+    .input(z.object({
+      adminId: z.number(),
+      newPassword: z.string().min(6, "Mínimo 6 caracteres"),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      const hash = await bcrypt.hash(input.newPassword, 12);
+      await db.update(adminUsers).set({ passwordHash: hash }).where(eq(adminUsers.id, input.adminId));
+      return { success: true };
+    }),
+
+  // Ativar/desativar admin
+  toggleActive: pibbAdminProcedure
+    .input(z.object({ adminId: z.number(), isActive: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      // Não permite desativar a si mesmo
+      if (ctx.admin.id === input.adminId && !input.isActive) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Você não pode desativar sua própria conta" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      await db.update(adminUsers).set({ isActive: input.isActive }).where(eq(adminUsers.id, input.adminId));
       return { success: true };
     }),
 });
