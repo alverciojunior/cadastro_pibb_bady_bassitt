@@ -49,6 +49,7 @@ type FormData = {
   spouseBaptismDate: string;
   spouseMinistry: string;
   spouseServiceArea: string;
+  spouseIsTither: string;
   hasChildren: string;
   childrenCount: string;
   children: { fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[];
@@ -115,6 +116,7 @@ export default function CadastroForm() {
     isBaptized: false,
     spouseIsBaptized: false,
     spouseBaptismDate: "",
+    spouseIsTither: "",
     hasChildren: "nao",
     childrenCount: "1",
     children: [],
@@ -213,6 +215,7 @@ export default function CadastroForm() {
       spouseBaptismDate: showSpouseSection && formData.spouseIsBaptized ? formData.spouseBaptismDate || null : null,
       spouseMinistry: showSpouseSection ? formData.spouseMinistry || null : null,
       spouseServiceArea: showSpouseSection ? formData.spouseServiceArea || null : null,
+      spouseIsTither: showSpouseSection ? (formData.spouseIsTither as any) || null : null,
       children: showChildrenSection
         ? childrenFields.filter((c) => c.fullName.trim()).map((c) => ({
             fullName: c.fullName,
@@ -807,6 +810,22 @@ function Step4({
                   {SERVICE_AREAS.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            <FormField label="Contribuição (Dízimo) do Cônjuge">
+              <Select
+                value={formData.spouseIsTither || ""}
+                onValueChange={(v) => updateField("spouseIsTither", v)}
+              >
+                <SelectTrigger className="h-12 text-base">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sim">Sim, é dizimista</SelectItem>
+                  <SelectItem value="nao">Não</SelectItem>
+                  <SelectItem value="ocasional">Às vezes / Oferta</SelectItem>
                 </SelectContent>
               </Select>
             </FormField>

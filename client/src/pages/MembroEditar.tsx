@@ -89,6 +89,7 @@ export default function MembroEditar() {
         spouseBaptismDate: formatDate(member.spouseBaptismDate),
         spouseMinistry: member.spouseMinistry || "",
         spouseServiceArea: member.spouseServiceArea || "",
+        spouseIsTither: member.spouseIsTither || "",
         memberType: member.memberType || "visitante",
         pastoralNotes: member.pastoralNotes || "",
       });
@@ -345,6 +346,16 @@ export default function MembroEditar() {
                 <Select value={formData.spouseMinistry || ""} onValueChange={(v) => set("spouseMinistry", v)}>
                   <SelectTrigger className="h-11"><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent>{MINISTRIES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Dízimo do Cônjuge">
+                <Select value={formData.spouseIsTither || ""} onValueChange={(v) => set("spouseIsTither", v)}>
+                  <SelectTrigger className="h-11"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sim">Sim</SelectItem>
+                    <SelectItem value="nao">Não</SelectItem>
+                    <SelectItem value="ocasional">Ocasional</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
             </div>

@@ -131,6 +131,7 @@ export const members = mysqlTable("members", {
   spouseBaptismDate: date("spouseBaptismDate"),
   spouseMinistry: varchar("spouseMinistry", { length: 100 }),
   spouseServiceArea: varchar("spouseServiceArea", { length: 255 }),
+  spouseIsTither: mysqlEnum("spouseIsTither", ["sim", "nao", "ocasional"]),
 
   // Classificação
   memberType: mysqlEnum("memberType", [

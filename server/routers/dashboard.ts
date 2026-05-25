@@ -22,8 +22,10 @@ export const dashboardRouter = router({
         id: members.id,
         memberType: members.memberType,
         isBaptized: members.isBaptized,
+        isTither: members.isTither,
         spouseName: members.spouseName,
         spouseIsBaptized: members.spouseIsBaptized,
+        spouseIsTither: members.spouseIsTither,
         createdAt: members.createdAt,
         hasDuplicate: members.hasDuplicate,
       })
@@ -57,6 +59,7 @@ export const dashboardRouter = router({
     let newThisMonth = 0;
     let newLastMonth = 0;
     let duplicates = 0;
+    const titherCounts: Record<string, number> = { sim: 0, nao: 0, ocasional: 0 };
 
     for (const m of allMembers) {
       totalMembersOnly++;
@@ -64,6 +67,10 @@ export const dashboardRouter = router({
       typeCounts[type] = (typeCounts[type] ?? 0) + 1;
 
       if (m.isBaptized) totalBaptized++;
+
+      // Dízimo do titular
+      const tither = m.isTither ?? null;
+      if (tither && tither in titherCounts) titherCounts[tither]++;
 
       const createdAt = m.createdAt ? new Date(m.createdAt) : null;
       if (createdAt) {
@@ -89,6 +96,11 @@ export const dashboardRouter = router({
         totalSpouses++;
         typeCounts[type] = (typeCounts[type] ?? 0) + 1;
         if (m.spouseIsBaptized) totalBaptized++;
+
+        // Dízimo do cônjuge
+        const spouseTither = m.spouseIsTither ?? null;
+        if (spouseTither && spouseTither in titherCounts) titherCounts[spouseTither]++;
+
         // Cônjuge conta como novo no mesmo mês do titular
         const createdAt = m.createdAt ? new Date(m.createdAt) : null;
         if (createdAt) {
@@ -191,6 +203,7 @@ export const dashboardRouter = router({
       newThisMonth,
       growthRate,
       duplicates,
+      titherCounts,
     };
   }),
 

@@ -67,6 +67,7 @@ export const memberInputSchema = z.object({
   spouseBaptismDate: z.string().optional().nullable(),
   spouseMinistry: z.string().optional().nullable(),
   spouseServiceArea: z.string().optional().nullable(),
+  spouseIsTither: z.enum(["sim", "nao", "ocasional"]).optional().nullable(),
 
   // Filhos
   children: z.array(childSchema).optional().default([]),
@@ -175,6 +176,7 @@ export const membersRouter = router({
       spouseBaptismDate: input.spouseBaptismDate ? new Date(input.spouseBaptismDate) : null,
       spouseMinistry: input.spouseMinistry ?? null,
       spouseServiceArea: input.spouseServiceArea ?? null,
+      spouseIsTither: input.spouseIsTither ?? null,
       memberType,
       pastoralNotes: input.pastoralNotes ?? null,
       hasDuplicate: isDuplicate,
@@ -297,6 +299,7 @@ export const membersRouter = router({
           spouseBaptismDate: input.data.spouseBaptismDate ? new Date(input.data.spouseBaptismDate) : null,
           spouseMinistry: input.data.spouseMinistry ?? null,
           spouseServiceArea: input.data.spouseServiceArea ?? null,
+          spouseIsTither: input.data.spouseIsTither ?? null,
           memberType: input.data.memberType ?? memberType,
           pastoralNotes: input.data.pastoralNotes ?? null,
           hasDuplicate: isDuplicate,

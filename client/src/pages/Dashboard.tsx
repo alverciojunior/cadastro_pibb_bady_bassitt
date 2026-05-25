@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import {
   Users, UserCheck, Home, Heart, Baby, TrendingUp,
-  AlertTriangle, Calendar, Church, Star, ArrowUp, ArrowDown
+  AlertTriangle, Calendar, Church, Star, ArrowUp, ArrowDown, Coins
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -153,6 +153,14 @@ export default function Dashboard() {
             loading={kpisLoading}
             color="bg-teal-50"
             trend={kpis?.growthRate}
+          />
+          <KpiCard
+            title="Dizimistas"
+            value={kpis ? (kpis.titherCounts?.sim ?? 0) : undefined}
+            subtitle={kpis ? `${kpis.titherCounts?.ocasional ?? 0} ocasionais` : undefined}
+            icon={<Coins className="text-yellow-600" size={24} />}
+            loading={kpisLoading}
+            color="bg-yellow-50"
           />
         </div>
 
