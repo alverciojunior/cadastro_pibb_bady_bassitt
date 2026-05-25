@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
+import { router, publicProcedure, pibbAdminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { members, families, memberChildren, memberUpdates } from "../../drizzle/schema";
@@ -245,7 +245,7 @@ export const membersRouter = router({
   }),
 
   // Atualizar membro
-  update: protectedProcedure
+  update: pibbAdminProcedure
     .input(z.object({ id: z.number(), data: memberInputSchema }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
@@ -291,7 +291,7 @@ export const membersRouter = router({
           memberType: input.data.memberType ?? memberType,
           pastoralNotes: input.data.pastoralNotes ?? null,
           hasDuplicate: isDuplicate,
-          lastUpdatedByUserId: ctx.user.id,
+          lastUpdatedByUserId: ctx.user?.id ?? ctx.admin?.id ?? null,
         })
         .where(eq(members.id, input.id));
 
@@ -311,9 +311,9 @@ export const membersRouter = router({
 
       await db.insert(memberUpdates).values({
         memberId: input.id,
-        updatedByUserId: ctx.user.id,
+        updatedByUserId: ctx.user?.id ?? ctx.admin?.id ?? null,
         changeType: "update",
-        changeDescription: `Dados atualizados por ${ctx.user.name || ctx.user.email}`,
+        changeDescription: `Dados atualizados por ${ctx.user?.name || ctx.user?.email || ctx.admin?.username || "admin"}`,
       });
 
       await notifyOwner({
@@ -350,7 +350,7 @@ export const membersRouter = router({
     }),
 
   // Listar membros (admin)
-  list: protectedProcedure
+  list: pibbAdminProcedure
     .input(
       z.object({
         search: z.string().optional(),
@@ -405,7 +405,7 @@ export const membersRouter = router({
     }),
 
   // Buscar membro por ID
-  getById: protectedProcedure.input(z.number()).query(async ({ input }) => {
+  getById: pibbAdminProcedure.input(z.number()).query(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "NOT_FOUND" });
 
@@ -431,7 +431,7 @@ export const membersRouter = router({
     }),
 
   // Gerar sugestões pastorais com IA
-  generatePastoralSuggestions: protectedProcedure
+  generatePastoralSuggestions: pibbAdminProcedure
     .input(z.number())
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -496,7 +496,7 @@ Seja acolhedor, respeitoso e prático. Máximo 300 palavras.`;
     }),
 
   // Atualizar observações pastorais manualmente
-  updatePastoralNotes: protectedProcedure
+  updatePastoralNotes: pibbAdminProcedure
     .input(z.object({ id: z.number(), notes: z.string() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -506,7 +506,7 @@ Seja acolhedor, respeitoso e prático. Máximo 300 palavras.`;
     }),
 
   // Desativar membro
-  deactivate: protectedProcedure.input(z.number()).mutation(async ({ input }) => {
+  deactivate: pibbAdminProcedure.input(z.number()).mutation(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
     await db.update(members).set({ isActive: false }).where(eq(members.id, input));

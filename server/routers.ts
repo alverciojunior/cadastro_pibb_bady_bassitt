@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { membersRouter } from "./routers/members";
 import { dashboardRouter } from "./routers/dashboard";
 import { whatsappRouter } from "./routers/whatsapp";
+import { adminAuthRouter } from "./routers/adminAuth";
 
 export const appRouter = router({
   system: systemRouter,
@@ -19,6 +20,7 @@ export const appRouter = router({
   members: membersRouter,
   dashboard: dashboardRouter,
   whatsapp: whatsappRouter,
+  adminAuth: adminAuthRouter,
 });
 
 export type AppRouter = typeof appRouter;

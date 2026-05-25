@@ -185,3 +185,17 @@ export const memberUpdates = mysqlTable("member_updates", {
 
 export type MemberUpdate = typeof memberUpdates.$inferSelect;
 export type InsertMemberUpdate = typeof memberUpdates.$inferInsert;
+
+// ─── Admin Users (Login próprio do painel) ────────────────────────────────────
+export const adminUsers = mysqlTable("admin_users", {
+  id: int("id").autoincrement().primaryKey(),
+  username: varchar("username", { length: 64 }).notNull().unique(),
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  name: text("name").notNull(),
+  isActive: boolean("isActive").notNull().default(true),
+  lastLoginAt: timestamp("lastLoginAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = typeof adminUsers.$inferInsert;

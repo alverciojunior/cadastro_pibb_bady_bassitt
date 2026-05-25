@@ -1,14 +1,10 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { ClipboardList, LayoutDashboard, Users, Heart, BookOpen, Shield, ArrowRight } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/pibb_logo_ca76fb8b.png";
 
 export default function Home() {
-  const { user, isAuthenticated, loading } = useAuth();
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-blue-50">
       {/* Header */}
@@ -29,29 +25,15 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-3">
-            {!loading && (
-              isAuthenticated ? (
-                <Link href="/dashboard">
-                  <Button
-                    variant="outline"
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
-                  >
-                    <LayoutDashboard size={16} />
-                    <span className="hidden sm:inline">Painel</span>
-                  </Button>
-                </Link>
-              ) : (
-                <a href={getLoginUrl()}>
-                  <Button
-                    variant="outline"
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
-                  >
-                    <Shield size={16} />
-                    <span className="hidden sm:inline">Liderança</span>
-                  </Button>
-                </a>
-              )
-            )}
+            <Link href="/admin/login">
+              <Button
+                variant="outline"
+                className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
+              >
+                <Shield size={16} />
+                <span className="hidden sm:inline">Liderança</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -86,18 +68,16 @@ export default function Home() {
               </Button>
             </Link>
 
-            {isAuthenticated && (
-              <Link href="/dashboard">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-16 px-8 text-lg font-semibold gap-3 w-full sm:w-auto border-primary text-primary hover:bg-primary/5"
-                >
-                  <LayoutDashboard size={22} />
-                  Painel Administrativo
-                </Button>
-              </Link>
-            )}
+            <Link href="/admin/login">
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-16 px-8 text-lg font-semibold gap-3 w-full sm:w-auto border-primary text-primary hover:bg-primary/5"
+              >
+                <LayoutDashboard size={22} />
+                Painel Administrativo
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

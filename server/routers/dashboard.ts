@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, pibbAdminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { members, families, memberChildren } from "../../drizzle/schema";
@@ -7,7 +7,7 @@ import { eq, and, sql, gte, lte, like, or } from "drizzle-orm";
 
 export const dashboardRouter = router({
   // KPIs principais
-  kpis: protectedProcedure.query(async () => {
+  kpis: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -122,7 +122,7 @@ export const dashboardRouter = router({
   }),
 
   // Distribuição por congregação
-  byCongregation: protectedProcedure.query(async () => {
+  byCongregation: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
@@ -143,7 +143,7 @@ export const dashboardRouter = router({
   }),
 
   // Distribuição por ministério
-  byMinistry: protectedProcedure.query(async () => {
+  byMinistry: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
@@ -164,7 +164,7 @@ export const dashboardRouter = router({
   }),
 
   // Faixa etária
-  byAgeGroup: protectedProcedure.query(async () => {
+  byAgeGroup: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
@@ -209,7 +209,7 @@ export const dashboardRouter = router({
   }),
 
   // Crescimento mensal (últimos 12 meses)
-  monthlyGrowth: protectedProcedure.query(async () => {
+  monthlyGrowth: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
@@ -241,7 +241,7 @@ export const dashboardRouter = router({
   }),
 
   // Aniversariantes do mês atual
-  birthdaysThisMonth: protectedProcedure.query(async () => {
+  birthdaysThisMonth: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
@@ -269,7 +269,7 @@ export const dashboardRouter = router({
   }),
 
   // Membros com duplicidade
-  duplicates: protectedProcedure.query(async () => {
+  duplicates: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 

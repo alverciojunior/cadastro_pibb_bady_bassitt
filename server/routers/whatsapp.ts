@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, publicProcedure, pibbAdminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { whatsappConfig, whatsappMessages } from "../../drizzle/schema";
@@ -92,7 +92,7 @@ export async function sendWhatsAppMessage(
 // ─── Router ───────────────────────────────────────────────────────────────────
 export const whatsappRouter = router({
   // Buscar configuração atual
-  getConfig: protectedProcedure.query(async () => {
+  getConfig: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -110,7 +110,7 @@ export const whatsappRouter = router({
   }),
 
   // Salvar/atualizar configuração
-  saveConfig: protectedProcedure
+  saveConfig: pibbAdminProcedure
     .input(
       z.object({
         evolutionApiUrl: z.string().url("URL inválida"),
@@ -162,7 +162,7 @@ export const whatsappRouter = router({
     }),
 
   // Verificar status da conexão com Evolution API
-  checkConnection: protectedProcedure.mutation(async () => {
+  checkConnection: pibbAdminProcedure.mutation(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -199,7 +199,7 @@ export const whatsappRouter = router({
   }),
 
   // Gerar QR Code para conectar instância
-  getQrCode: protectedProcedure.mutation(async () => {
+  getQrCode: pibbAdminProcedure.mutation(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -239,7 +239,7 @@ export const whatsappRouter = router({
   }),
 
   // Enviar mensagem de teste
-  sendTest: protectedProcedure
+  sendTest: pibbAdminProcedure
     .input(z.object({ phone: z.string(), message: z.string() }))
     .mutation(async ({ input }) => {
       const ok = await sendWhatsAppMessage(input.phone, input.message, { messageType: "test", memberName: "Teste Manual" });
@@ -248,7 +248,7 @@ export const whatsappRouter = router({
     }),
 
   // Ativar/desativar cron de aniversariantes
-  toggleBirthdayCron: protectedProcedure
+  toggleBirthdayCron: pibbAdminProcedure
     .input(z.object({ enable: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
@@ -299,7 +299,7 @@ export const whatsappRouter = router({
     }),
 
   // Histórico de mensagens enviadas
-  messageHistory: protectedProcedure
+  messageHistory: pibbAdminProcedure
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -360,7 +360,7 @@ export const whatsappRouter = router({
     }),
 
   // Estatísticas rápidas do histórico
-  messageStats: protectedProcedure.query(async () => {
+  messageStats: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 

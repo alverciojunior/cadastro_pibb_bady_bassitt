@@ -43,3 +43,21 @@ export const adminProcedure = t.procedure.use(
     });
   }),
 );
+
+// Procedure protegida pelo login próprio da PIBB (cookie pibb_admin_session)
+export const pibbAdminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.admin) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Acesso restrito. Faça login no painel administrativo." });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        admin: ctx.admin,
+      },
+    });
+  }),
+);

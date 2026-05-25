@@ -82,3 +82,15 @@
 - [x] Router tRPC: listar histórico com filtros e paginação
 - [x] Página de histórico de mensagens no painel administrativo
 - [x] Item de menu "Histórico" na seção WhatsApp do sidebar
+
+## Login Administrativo (usuário e senha)
+- [x] Tabela `admin_users` com username, senha (hash bcrypt) e nome
+- [x] Seed do admin padrão (admin / pibb2024)
+- [x] Router tRPC: login com username+senha, retorna token JWT em cookie
+- [x] Router tRPC: logout (limpa cookie)
+- [x] Router tRPC: me (verifica sessão admin)
+- [x] Middleware adminAuth para proteger rotas do painel
+- [x] Tela de login (/admin/login) com identidade visual da igreja
+- [x] Proteção de todas as rotas do painel (/dashboard, /membros, /whatsapp, etc.)
+- [x] Botão "Painel Administrativo" na home redireciona para /admin/login
+- [x] Redirecionamento automático após login bem-sucedido
