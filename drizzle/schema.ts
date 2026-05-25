@@ -168,6 +168,7 @@ export const memberChildren = mysqlTable("member_children", {
   birthDate: date("birthDate"),
   isBaptized: boolean("isBaptized").default(false),
   baptismDate: date("baptismDate"),
+  ministry: varchar("ministry", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

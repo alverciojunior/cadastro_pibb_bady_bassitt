@@ -51,7 +51,7 @@ type FormData = {
   spouseServiceArea: string;
   hasChildren: string;
   childrenCount: string;
-  children: { fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[];
+  children: { fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[];
 };
 
 const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
@@ -109,7 +109,7 @@ export default function CadastroForm() {
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [submitted, setSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
-  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[]>([]);
+  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
 
   const [formData, setFormData] = useState<Partial<FormData>>({
     isBaptized: false,
@@ -152,11 +152,12 @@ export default function CadastroForm() {
       birthDate: childrenFields[i]?.birthDate || "",
       isBaptized: childrenFields[i]?.isBaptized ?? false,
       baptismDate: childrenFields[i]?.baptismDate || "",
+      ministry: childrenFields[i]?.ministry || "",
     }));
     setChildrenFields(newChildren);
   };
 
-  const updateChild = (index: number, field: "fullName" | "birthDate" | "isBaptized" | "baptismDate", value: string | boolean) => {
+  const updateChild = (index: number, field: "fullName" | "birthDate" | "isBaptized" | "baptismDate" | "ministry", value: string | boolean) => {
     const updated = [...childrenFields];
     updated[index] = { ...updated[index], [field]: value };
     setChildrenFields(updated);
@@ -218,6 +219,7 @@ export default function CadastroForm() {
             birthDate: c.birthDate || null,
             isBaptized: c.isBaptized ?? false,
             baptismDate: c.isBaptized ? c.baptismDate || null : null,
+            ministry: c.ministry || null,
           }))
         : [],
     };
@@ -896,6 +898,14 @@ function Step4({
                     />
                   </FormField>
                 )}
+                <FormField label="Ministério (opcional)">
+                  <Input
+                    placeholder="Ex: Louvor, Escola Dominical..."
+                    value={child.ministry || ""}
+                    onChange={(e) => updateChild(idx, "ministry", e.target.value)}
+                    className="h-12 text-base"
+                  />
+                </FormField>
               </div>
             ))}
           </div>

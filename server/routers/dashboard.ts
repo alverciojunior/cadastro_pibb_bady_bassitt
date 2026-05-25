@@ -3,10 +3,10 @@ import { router, pibbAdminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { members, families, memberChildren } from "../../drizzle/schema";
-import { eq, and, sql, gte, lte, like, or } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export const dashboardRouter = router({
-  // KPIs principais
+  // ─── KPIs principais ────────────────────────────────────────────────────────
   kpis: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
@@ -16,240 +16,255 @@ export const dashboardRouter = router({
     const thisYear = now.getFullYear();
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-    const [
-      totalMembers,
-      byType,
-      totalFamilies,
-      totalBaptizedMembers,
-      totalBaptizedSpouses,
-      totalBaptizedChildren,
-      birthdaysThisMonthMembers,
-      birthdaysThisMonthSpouses,
-      birthdaysThisMonthChildren,
-      newThisMonth,
-      newLastMonth,
-      duplicates,
-      totalSpouses,
-      totalChildren,
-    ] = await Promise.all([
-      // Total membros principais ativos
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(eq(members.isActive, true)),
+    // Buscar todos os membros ativos com seus dados
+    const allMembers = await db
+      .select({
+        id: members.id,
+        memberType: members.memberType,
+        isBaptized: members.isBaptized,
+        spouseName: members.spouseName,
+        spouseIsBaptized: members.spouseIsBaptized,
+        createdAt: members.createdAt,
+        hasDuplicate: members.hasDuplicate,
+      })
+      .from(members)
+      .where(eq(members.isActive, true));
 
-      // Por tipo (membros principais)
-      db
-        .select({
-          memberType: members.memberType,
-          count: sql<number>`count(*)`,
-        })
-        .from(members)
-        .where(eq(members.isActive, true))
-        .groupBy(members.memberType),
+    // Buscar todos os filhos
+    const allChildren = await db
+      .select({
+        id: memberChildren.id,
+        memberId: memberChildren.memberId,
+        isBaptized: memberChildren.isBaptized,
+        birthDate: memberChildren.birthDate,
+      })
+      .from(memberChildren);
 
-      // Total famílias
-      db.select({ count: sql<number>`count(*)` }).from(families),
+    // Mapear memberId → memberType para herança dos filhos
+    const memberTypeMap = new Map(allMembers.map((m) => [m.id, m.memberType]));
 
-      // Batizados - membros principais
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(and(eq(members.isActive, true), eq(members.isBaptized, true))),
+    // Contagens por tipo — titular + cônjuge (herda tipo) + filhos (herdam tipo)
+    const typeCounts: Record<string, number> = {
+      membro_ativo: 0,
+      frequentante: 0,
+      visitante: 0,
+      afastado: 0,
+    };
 
-      // Batizados - cônjuges (spouseName preenchido e spouseIsBaptized = true)
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            eq(members.spouseIsBaptized, true),
-            sql`${members.spouseName} IS NOT NULL AND ${members.spouseName} != ''`
-          )
-        ),
+    let totalMembersOnly = 0;
+    let totalSpouses = 0;
+    let totalBaptized = 0;
+    let newThisMonth = 0;
+    let newLastMonth = 0;
+    let duplicates = 0;
 
-      // Batizados - filhos
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(memberChildren)
-        .where(eq(memberChildren.isBaptized, true)),
+    for (const m of allMembers) {
+      totalMembersOnly++;
+      const type = m.memberType ?? "visitante";
+      typeCounts[type] = (typeCounts[type] ?? 0) + 1;
 
-      // Aniversariantes do mês - membros principais
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            sql`MONTH(${members.birthDate}) = ${thisMonth}`
-          )
-        ),
+      if (m.isBaptized) totalBaptized++;
 
-      // Aniversariantes do mês - cônjuges
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            sql`MONTH(${members.spouseBirthDate}) = ${thisMonth}`,
-            sql`${members.spouseName} IS NOT NULL AND ${members.spouseName} != ''`
-          )
-        ),
+      const createdAt = m.createdAt ? new Date(m.createdAt) : null;
+      if (createdAt) {
+        if (
+          createdAt.getFullYear() === thisYear &&
+          createdAt.getMonth() + 1 === thisMonth
+        ) {
+          newThisMonth++;
+        }
+        if (
+          createdAt.getFullYear() === lastMonth.getFullYear() &&
+          createdAt.getMonth() + 1 === lastMonth.getMonth() + 1
+        ) {
+          newLastMonth++;
+        }
+      }
 
-      // Aniversariantes do mês - filhos
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(memberChildren)
-        .where(sql`MONTH(${memberChildren.birthDate}) = ${thisMonth}`),
+      if (m.hasDuplicate) duplicates++;
 
-      // Novos este mês (membros principais)
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            sql`YEAR(${members.createdAt}) = ${thisYear}`,
-            sql`MONTH(${members.createdAt}) = ${thisMonth}`
-          )
-        ),
-
-      // Novos mês passado
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            sql`YEAR(${members.createdAt}) = ${lastMonth.getFullYear()}`,
-            sql`MONTH(${members.createdAt}) = ${lastMonth.getMonth() + 1}`
-          )
-        ),
-
-      // Duplicidades
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(and(eq(members.isActive, true), eq(members.hasDuplicate, true))),
-
-      // Cônjuges cadastrados (spouseName preenchido)
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(members)
-        .where(
-          and(
-            eq(members.isActive, true),
-            sql`${members.spouseName} IS NOT NULL AND ${members.spouseName} != ''`
-          )
-        ),
-
-      // Filhos cadastrados
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(memberChildren),
-    ]);
-
-    const typeMap: Record<string, number> = {};
-    for (const row of byType) {
-      if (row.memberType) typeMap[row.memberType] = Number(row.count);
+      // Cônjuge herda tipo do titular
+      const hasSpouse = m.spouseName && m.spouseName.trim() !== "";
+      if (hasSpouse) {
+        totalSpouses++;
+        typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+        if (m.spouseIsBaptized) totalBaptized++;
+        // Cônjuge conta como novo no mesmo mês do titular
+        const createdAt = m.createdAt ? new Date(m.createdAt) : null;
+        if (createdAt) {
+          if (
+            createdAt.getFullYear() === thisYear &&
+            createdAt.getMonth() + 1 === thisMonth
+          ) {
+            newThisMonth++;
+          }
+          if (
+            createdAt.getFullYear() === lastMonth.getFullYear() &&
+            createdAt.getMonth() + 1 === lastMonth.getMonth() + 1
+          ) {
+            newLastMonth++;
+          }
+        }
+      }
     }
 
-    const totalMembersCount = Number(totalMembers[0]?.count ?? 0);
-    const totalSpousesCount = Number(totalSpouses[0]?.count ?? 0);
-    const totalChildrenCount = Number(totalChildren[0]?.count ?? 0);
-    const totalPeople = totalMembersCount + totalSpousesCount + totalChildrenCount;
+    // Filhos herdam tipo do titular
+    let totalChildren = 0;
+    for (const child of allChildren) {
+      totalChildren++;
+      const type = memberTypeMap.get(child.memberId) ?? "visitante";
+      typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+      if (child.isBaptized) totalBaptized++;
+    }
 
-    const totalBaptizedCount =
-      Number(totalBaptizedMembers[0]?.count ?? 0) +
-      Number(totalBaptizedSpouses[0]?.count ?? 0) +
-      Number(totalBaptizedChildren[0]?.count ?? 0);
-
-    const birthdaysCount =
-      Number(birthdaysThisMonthMembers[0]?.count ?? 0) +
-      Number(birthdaysThisMonthSpouses[0]?.count ?? 0) +
-      Number(birthdaysThisMonthChildren[0]?.count ?? 0);
-
-    const newThisMonthCount = Number(newThisMonth[0]?.count ?? 0);
-    const newLastMonthCount = Number(newLastMonth[0]?.count ?? 0);
+    const totalPeople = totalMembersOnly + totalSpouses + totalChildren;
     const growthRate =
-      newLastMonthCount > 0
-        ? Math.round(((newThisMonthCount - newLastMonthCount) / newLastMonthCount) * 100)
+      newLastMonth > 0
+        ? Math.round(((newThisMonth - newLastMonth) / newLastMonth) * 100)
         : 0;
+
+    // Total de famílias
+    const [familiesRow] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(families);
+
+    // Aniversariantes do mês — membros + cônjuges + filhos
+    const birthdayMembersRows = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(members)
+      .where(
+        and(
+          eq(members.isActive, true),
+          sql`MONTH(${members.birthDate}) = ${thisMonth}`
+        )
+      );
+    const birthdaySpousesRows = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(members)
+      .where(
+        and(
+          eq(members.isActive, true),
+          sql`MONTH(${members.spouseBirthDate}) = ${thisMonth}`,
+          sql`${members.spouseName} IS NOT NULL AND ${members.spouseName} != ''`
+        )
+      );
+    const birthdayChildrenRows = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(memberChildren)
+      .where(sql`MONTH(${memberChildren.birthDate}) = ${thisMonth}`);
+
+    const birthdaysThisMonth =
+      Number(birthdayMembersRows[0]?.count ?? 0) +
+      Number(birthdaySpousesRows[0]?.count ?? 0) +
+      Number(birthdayChildrenRows[0]?.count ?? 0);
 
     return {
       totalMembers: totalPeople,
-      totalMembersOnly: totalMembersCount,
-      totalSpouses: totalSpousesCount,
-      totalChildren: totalChildrenCount,
-      membrosAtivos: typeMap["membro_ativo"] ?? 0,
-      frequentantes: typeMap["frequentante"] ?? 0,
-      visitantes: typeMap["visitante"] ?? 0,
-      afastados: typeMap["afastado"] ?? 0,
-      totalFamilies: Number(totalFamilies[0]?.count ?? 0),
-      totalBaptized: totalBaptizedCount,
-      birthdaysThisMonth: birthdaysCount,
-      newThisMonth: newThisMonthCount,
+      totalMembersOnly,
+      totalSpouses,
+      totalChildren,
+      membrosAtivos: typeCounts["membro_ativo"] ?? 0,
+      frequentantes: typeCounts["frequentante"] ?? 0,
+      visitantes: typeCounts["visitante"] ?? 0,
+      afastados: typeCounts["afastado"] ?? 0,
+      totalFamilies: Number(familiesRow?.count ?? 0),
+      totalBaptized,
+      birthdaysThisMonth,
+      newThisMonth,
       growthRate,
-      duplicates: Number(duplicates[0]?.count ?? 0),
+      duplicates,
     };
   }),
 
-  // Distribuição por congregação
+  // ─── Distribuição por congregação — titular + cônjuge (mesma congregação) + filhos ─
   byCongregation: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
-    const result = await db
+    // Buscar membros com congregação
+    const memberRows = await db
       .select({
         congregation: members.congregation,
-        count: sql<number>`count(*)`,
+        spouseName: members.spouseName,
+        childrenCount: sql<number>`(SELECT COUNT(*) FROM member_children mc WHERE mc.memberId = ${members.id})`,
       })
       .from(members)
-      .where(and(eq(members.isActive, true), sql`${members.congregation} IS NOT NULL`))
-      .groupBy(members.congregation)
-      .orderBy(sql`count(*) DESC`);
+      .where(and(eq(members.isActive, true)));
 
-    return result.map((r) => ({
-      name: r.congregation || "Não informado",
-      value: Number(r.count),
-    }));
+    const counts: Record<string, number> = {};
+    for (const row of memberRows) {
+      const cong = row.congregation?.trim() || "Não informado";
+      // Titular
+      counts[cong] = (counts[cong] ?? 0) + 1;
+      // Cônjuge herda congregação
+      if (row.spouseName && row.spouseName.trim()) {
+        counts[cong] = (counts[cong] ?? 0) + 1;
+      }
+      // Filhos herdam congregação
+      const childCount = Number(row.childrenCount ?? 0);
+      if (childCount > 0) {
+        counts[cong] = (counts[cong] ?? 0) + childCount;
+      }
+    }
+
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([name, value]) => ({ name, value }));
   }),
 
-  // Distribuição por ministério
+  // ─── Distribuição por ministério — titular + cônjuge (spouseMinistry) + filhos (ministry) ─
   byMinistry: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
-    const result = await db
+    const memberRows = await db
       .select({
         ministry: members.ministry,
-        count: sql<number>`count(*)`,
+        spouseMinistry: members.spouseMinistry,
+        spouseName: members.spouseName,
       })
       .from(members)
-      .where(and(eq(members.isActive, true), sql`${members.ministry} IS NOT NULL`))
-      .groupBy(members.ministry)
-      .orderBy(sql`count(*) DESC`);
+      .where(and(eq(members.isActive, true)));
 
-    return result.map((r) => ({
-      name: r.ministry || "Não informado",
-      value: Number(r.count),
-    }));
+    const childRows = await db
+      .select({ ministry: memberChildren.ministry })
+      .from(memberChildren)
+      .where(sql`${memberChildren.ministry} IS NOT NULL AND ${memberChildren.ministry} != ''`);
+
+    const counts: Record<string, number> = {};
+
+    for (const row of memberRows) {
+      const m = row.ministry?.trim() || "Sem ministério";
+      counts[m] = (counts[m] ?? 0) + 1;
+
+      if (row.spouseName && row.spouseName.trim()) {
+        const sm = row.spouseMinistry?.trim() || "Sem ministério";
+        counts[sm] = (counts[sm] ?? 0) + 1;
+      }
+    }
+
+    for (const row of childRows) {
+      const cm = row.ministry?.trim() || "Sem ministério";
+      counts[cm] = (counts[cm] ?? 0) + 1;
+    }
+
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([name, value]) => ({ name, value }));
   }),
 
-  // Faixa etária — inclui membros principais, cônjuges e filhos
+  // ─── Faixa etária — titular + cônjuge + filhos ───────────────────────────────
   byAgeGroup: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
 
     const ORDER = [
-      'Criança (0-11)',
-      'Adolescente (12-17)',
-      'Jovem (18-29)',
-      'Adulto (30-44)',
-      'Adulto (45-59)',
-      'Idoso (60+)',
+      "Criança (0-11)",
+      "Adolescente (12-17)",
+      "Jovem (18-29)",
+      "Adulto (30-44)",
+      "Adulto (45-59)",
+      "Idoso (60+)",
     ];
 
     const counts: Record<string, number> = {};
@@ -262,18 +277,21 @@ export const dashboardRouter = router({
       const m = now.getMonth() - birth.getMonth();
       if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
       let label: string;
-      if (age < 12) label = 'Criança (0-11)';
-      else if (age < 18) label = 'Adolescente (12-17)';
-      else if (age < 30) label = 'Jovem (18-29)';
-      else if (age < 45) label = 'Adulto (30-44)';
-      else if (age < 60) label = 'Adulto (45-59)';
-      else label = 'Idoso (60+)';
+      if (age < 12) label = "Criança (0-11)";
+      else if (age < 18) label = "Adolescente (12-17)";
+      else if (age < 30) label = "Jovem (18-29)";
+      else if (age < 45) label = "Adulto (30-44)";
+      else if (age < 60) label = "Adulto (45-59)";
+      else label = "Idoso (60+)";
       counts[label] = (counts[label] ?? 0) + 1;
     }
 
-    // Membros principais
     const memberRows = await db
-      .select({ birthDate: members.birthDate, spouseBirthDate: members.spouseBirthDate, spouseName: members.spouseName })
+      .select({
+        birthDate: members.birthDate,
+        spouseBirthDate: members.spouseBirthDate,
+        spouseName: members.spouseName,
+      })
       .from(members)
       .where(and(eq(members.isActive, true)));
 
@@ -282,7 +300,6 @@ export const dashboardRouter = router({
       if (row.spouseName && row.spouseName.trim()) addAge(row.spouseBirthDate);
     }
 
-    // Filhos
     const childRows = await db
       .select({ birthDate: memberChildren.birthDate })
       .from(memberChildren)
@@ -298,7 +315,7 @@ export const dashboardRouter = router({
     }));
   }),
 
-  // Crescimento mensal (últimos 12 meses)
+  // ─── Crescimento mensal — conta titular + cônjuge + filhos no mês do cadastro ─
   monthlyGrowth: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
@@ -307,7 +324,11 @@ export const dashboardRouter = router({
     cutoff.setMonth(cutoff.getMonth() - 12);
 
     const rows = await db
-      .select({ createdAt: members.createdAt })
+      .select({
+        createdAt: members.createdAt,
+        spouseName: members.spouseName,
+        childrenCount: sql<number>`(SELECT COUNT(*) FROM member_children mc WHERE mc.memberId = ${members.id})`,
+      })
       .from(members)
       .where(
         and(
@@ -320,8 +341,18 @@ export const dashboardRouter = router({
     for (const row of rows) {
       if (!row.createdAt) continue;
       const d = new Date(row.createdAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      // Titular
       counts[key] = (counts[key] ?? 0) + 1;
+      // Cônjuge
+      if (row.spouseName && row.spouseName.trim()) {
+        counts[key] = (counts[key] ?? 0) + 1;
+      }
+      // Filhos
+      const childCount = Number(row.childrenCount ?? 0);
+      if (childCount > 0) {
+        counts[key] = (counts[key] ?? 0) + childCount;
+      }
     }
 
     return Object.entries(counts)
@@ -329,7 +360,7 @@ export const dashboardRouter = router({
       .map(([month, count]) => ({ month, count }));
   }),
 
-  // Aniversariantes do mês atual — inclui cônjuges e filhos
+  // ─── Aniversariantes do mês — titular + cônjuge + filhos ────────────────────
   birthdaysThisMonth: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
@@ -337,7 +368,6 @@ export const dashboardRouter = router({
     const now = new Date();
     const thisMonth = now.getMonth() + 1;
 
-    // Membros principais
     const memberBirthdays = await db
       .select({
         id: members.id,
@@ -355,7 +385,6 @@ export const dashboardRouter = router({
         )
       );
 
-    // Cônjuges
     const spouseBirthdays = await db
       .select({
         id: members.id,
@@ -374,7 +403,6 @@ export const dashboardRouter = router({
         )
       );
 
-    // Filhos
     const childBirthdays = await db
       .select({
         id: memberChildren.id,
@@ -400,7 +428,7 @@ export const dashboardRouter = router({
     return all;
   }),
 
-  // Membros com duplicidade
+  // ─── Membros com duplicidade ─────────────────────────────────────────────────
   duplicates: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];

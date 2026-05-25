@@ -16,6 +16,7 @@ const childSchema = z.object({
   birthDate: z.string().optional().nullable(),
   isBaptized: z.boolean().optional().default(false),
   baptismDate: z.string().optional().nullable(),
+  ministry: z.string().optional().nullable(),
 });
 
 export const memberInputSchema = z.object({
@@ -196,6 +197,7 @@ export const membersRouter = router({
           birthDate: child.birthDate ? new Date(child.birthDate) : null,
           isBaptized: child.isBaptized ?? false,
           baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
+          ministry: child.ministry ?? null,
         });
       }
     }
@@ -314,6 +316,7 @@ export const membersRouter = router({
             birthDate: child.birthDate ? new Date(child.birthDate) : null,
             isBaptized: child.isBaptized ?? false,
             baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
+            ministry: child.ministry ?? null,
           });
         }
       }

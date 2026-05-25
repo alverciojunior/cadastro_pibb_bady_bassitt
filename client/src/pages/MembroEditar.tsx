@@ -51,7 +51,7 @@ export default function MembroEditar() {
   });
 
   const [formData, setFormData] = useState<any>({});
-  const [children, setChildren] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string }[]>([]);
+  const [children, setChildren] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
 
   useEffect(() => {
     if (member) {
@@ -98,6 +98,7 @@ export default function MembroEditar() {
           birthDate: c.birthDate ? new Date(c.birthDate).toISOString().split("T")[0] : "",
           isBaptized: c.isBaptized ?? false,
           baptismDate: c.baptismDate ? new Date(c.baptismDate).toISOString().split("T")[0] : "",
+          ministry: (c as any).ministry || "",
         }))
       );
     }
@@ -130,6 +131,7 @@ export default function MembroEditar() {
           birthDate: c.birthDate || null,
           isBaptized: c.isBaptized ?? false,
           baptismDate: c.isBaptized ? c.baptismDate || null : null,
+          ministry: c.ministry || null,
         })),
       },
     });
@@ -356,7 +358,7 @@ export default function MembroEditar() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setChildren([...children, { fullName: "", birthDate: "", isBaptized: false, baptismDate: "" }])}
+              onClick={() => setChildren([...children, { fullName: "", birthDate: "", isBaptized: false, baptismDate: "", ministry: "" }])}
             >
               + Adicionar Filho
             </Button>
@@ -427,6 +429,18 @@ export default function MembroEditar() {
                     />
                   </FormField>
                 )}
+                <FormField label="Ministério (opcional)">
+                  <Input
+                    placeholder="Ex: Louvor, Escola Dominical..."
+                    value={child.ministry || ""}
+                    onChange={(e) => {
+                      const updated = [...children];
+                      updated[idx] = { ...updated[idx], ministry: e.target.value };
+                      setChildren(updated);
+                    }}
+                    className="h-11"
+                  />
+                </FormField>
               </div>
             ))
           )}
