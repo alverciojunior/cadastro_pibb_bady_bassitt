@@ -9,7 +9,7 @@ import * as jose from "jose";
 import { ENV } from "../_core/env";
 
 const ADMIN_COOKIE = "pibb_admin_session";
-const COOKIE_MAX_AGE = 60 * 60 * 8; // 8 horas
+const COOKIE_MAX_AGE = 60 * 60 * 8 * 1000; // 8 horas em milissegundos (Express usa ms)
 
 function isSecureRequest(req: any): boolean {
   if (req.protocol === "https") return true;
