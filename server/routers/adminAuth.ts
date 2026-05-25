@@ -11,12 +11,19 @@ import { ENV } from "../_core/env";
 const ADMIN_COOKIE = "pibb_admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 8; // 8 horas
 
+function isSecureRequest(req: any): boolean {
+  if (req.protocol === "https") return true;
+  const fwd = req.headers["x-forwarded-proto"];
+  if (!fwd) return false;
+  const list = Array.isArray(fwd) ? fwd : fwd.split(",");
+  return list.some((p: string) => p.trim().toLowerCase() === "https");
+}
+
 function getAdminCookieOptions(req: any) {
-  const isSecure = req.protocol === "https" || req.headers["x-forwarded-proto"] === "https";
   return {
     httpOnly: true,
-    secure: isSecure,
-    sameSite: isSecure ? ("none" as const) : ("lax" as const),
+    secure: isSecureRequest(req),
+    sameSite: "none" as const,
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   };
