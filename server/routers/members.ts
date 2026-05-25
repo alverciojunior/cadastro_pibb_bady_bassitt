@@ -529,6 +529,25 @@ Seja acolhedor, respeitoso e prático. Máximo 300 palavras.`;
     return { success: true };
   }),
 
+  // Excluir membro
+  delete: pibbAdminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      // Excluir filhos
+      await db.delete(memberChildren).where(eq(memberChildren.memberId, input.id));
+
+      // Excluir atualizações
+      await db.delete(memberUpdates).where(eq(memberUpdates.memberId, input.id));
+
+      // Excluir membro
+      await db.delete(members).where(eq(members.id, input.id));
+
+      return { success: true };
+    }),
+
   // Listar congregações e ministérios únicos
   getOptions: publicProcedure.query(async () => {
     const db = await getDb();

@@ -142,3 +142,9 @@
 - [x] Página de upload de planilha
 - [x] Feedback de sucesso/erro por linha
 - [x] Tratamento de duplicatas
+
+## Botão de Exclusão de Membro
+- [x] Adicionar ícone de lixeira ao lado do botão de editar
+- [x] Implementar confirmação antes de excluir
+- [x] Criar router tRPC para exclusão de membro
+- [x] Excluir filhos e histórico de alterações associados

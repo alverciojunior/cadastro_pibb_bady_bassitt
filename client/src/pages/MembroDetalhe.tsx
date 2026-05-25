@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   User, Phone, Mail, MapPin, Church, Heart, Baby,
   BookOpen, Sparkles, Edit, ChevronLeft, AlertTriangle,
-  Loader2, CheckCircle2, Calendar
+  Loader2, CheckCircle2, Calendar, Trash2
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -73,6 +73,22 @@ export default function MembroDetalhe() {
     },
   });
 
+  const deleteMember = trpc.members.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Membro excluído com sucesso!");
+      navigate("/membros");
+    },
+    onError: (err) => {
+      toast.error("Erro ao excluir membro: " + err.message);
+    },
+  });
+
+  const handleDelete = () => {
+    if (window.confirm(`Tem certeza que deseja excluir ${member?.fullName}? Esta ação não pode ser desfeita.`)) {
+      deleteMember.mutate({ id: memberId });
+    }
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -118,12 +134,23 @@ export default function MembroDetalhe() {
               Voltar
             </Button>
           </Link>
-          <Link href={`/membros/${memberId}/editar`}>
-            <Button className="gap-2 bg-primary hover:bg-primary/90">
-              <Edit size={16} />
-              Editar
+          <div className="flex gap-2">
+            <Link href={`/membros/${memberId}/editar`}>
+              <Button className="gap-2 bg-primary hover:bg-primary/90">
+                <Edit size={16} />
+                Editar
+              </Button>
+            </Link>
+            <Button
+              variant="destructive"
+              className="gap-2"
+              onClick={handleDelete}
+              disabled={deleteMember.isPending}
+            >
+              <Trash2 size={16} />
+              {deleteMember.isPending ? "Excluindo..." : "Excluir"}
             </Button>
-          </Link>
+          </div>
         </div>
 
         {/* Header Card */}
