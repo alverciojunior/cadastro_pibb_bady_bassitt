@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ClipboardList, LayoutDashboard, Users, Heart, BookOpen, Shield, ArrowRight } from "lucide-react";
+import { ClipboardList, Users, Heart, BookOpen, Shield, ArrowRight } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
 
@@ -68,16 +68,6 @@ export default function Home() {
               </Button>
             </Link>
 
-            <Link href="/admin/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-16 px-8 text-lg font-semibold gap-3 w-full sm:w-auto border-primary text-primary hover:bg-primary/5"
-              >
-                <LayoutDashboard size={22} />
-                Painel Administrativo
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
