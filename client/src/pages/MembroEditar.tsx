@@ -430,16 +430,17 @@ export default function MembroEditar() {
                   </FormField>
                 )}
                 <FormField label="Ministério (opcional)">
-                  <Input
-                    placeholder="Ex: Louvor, Escola Dominical..."
+                  <Select
                     value={child.ministry || ""}
-                    onChange={(e) => {
+                    onValueChange={(v) => {
                       const updated = [...children];
-                      updated[idx] = { ...updated[idx], ministry: e.target.value };
+                      updated[idx] = { ...updated[idx], ministry: v };
                       setChildren(updated);
                     }}
-                    className="h-11"
-                  />
+                  >
+                    <SelectTrigger className="h-11"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectContent>{MINISTRIES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                  </Select>
                 </FormField>
               </div>
             ))

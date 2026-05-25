@@ -899,12 +899,19 @@ function Step4({
                   </FormField>
                 )}
                 <FormField label="Ministério (opcional)">
-                  <Input
-                    placeholder="Ex: Louvor, Escola Dominical..."
+                  <Select
                     value={child.ministry || ""}
-                    onChange={(e) => updateChild(idx, "ministry", e.target.value)}
-                    className="h-12 text-base"
-                  />
+                    onValueChange={(v) => updateChild(idx, "ministry", v)}
+                  >
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MINISTRIES.map((m) => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormField>
               </div>
             ))}
