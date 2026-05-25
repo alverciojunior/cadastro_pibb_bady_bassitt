@@ -67,7 +67,7 @@ export default function DashboardLayout({
               Acesso Restrito à Liderança
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Esta área é exclusiva para a liderança e administração da PIBB Bady Bassitt. Faça login para continuar.
+              Esta área é exclusiva para a liderança e administração da PIB Bady Bassitt. Faça login para continuar.
             </p>
           </div>
           <Button
@@ -173,7 +173,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold tracking-tight truncate">
-                    PIBB Bady Bassitt
+                    PIB Bady Bassitt
                   </span>
                 </div>
               ) : null}

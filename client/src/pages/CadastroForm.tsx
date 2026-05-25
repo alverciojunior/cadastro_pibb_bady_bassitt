@@ -222,7 +222,7 @@ export default function CadastroForm() {
       {/* Header */}
       <header className="church-gradient text-white py-6 px-4 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center gap-4">
-          <img src={LOGO_URL} alt="PIBB Bady Bassitt" className="h-14 w-auto object-contain" />
+          <img src={LOGO_URL} alt="PIB Bady Bassitt" className="h-14 w-auto object-contain" />
           <div>
             <h1 className="text-xl font-serif font-bold leading-tight">
               Primeira Igreja Batista
@@ -548,7 +548,7 @@ function Step3({ formData, updateField }: { formData: Partial<FormData>; updateF
     <div className="space-y-5">
       <div className="form-card p-6">
         <h2 className="text-xl font-serif font-bold text-primary mb-1">Vida na Igreja</h2>
-        <p className="text-muted-foreground text-sm mb-5">Sua participação na PIBB Bady Bassitt</p>
+        <p className="text-muted-foreground text-sm mb-5">Sua participação na PIB Bady Bassitt</p>
 
         <div className="space-y-4">
           <FormField label="Congregação">
@@ -884,7 +884,7 @@ function SuccessScreen({ data }: { data: any }) {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex flex-col">
       <header className="church-gradient text-white py-6 px-4 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center gap-4">
-          <img src={LOGO_URL} alt="PIBB Bady Bassitt" className="h-14 w-auto object-contain" />
+          <img src={LOGO_URL} alt="PIB Bady Bassitt" className="h-14 w-auto object-contain" />
           <div>
             <h1 className="text-xl font-serif font-bold">Primeira Igreja Batista</h1>
             <p className="text-blue-200 text-sm">Bady Bassitt - SP</p>
@@ -927,7 +927,7 @@ function SuccessScreen({ data }: { data: any }) {
           </div>
 
           <p className="text-sm text-muted-foreground">
-            A liderança da PIBB Bady Bassitt foi notificada e entrará em contato em breve.
+            A liderança da PIB Bady Bassitt foi notificada e entrará em contato em breve.
             Que Deus abençoe sua vida!
           </p>
         </div>

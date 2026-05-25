@@ -62,7 +62,7 @@ export default function Dashboard() {
               Painel Administrativo
             </h1>
             <p className="text-muted-foreground">
-              Visão geral da base de membros da PIBB Bady Bassitt
+              Visão geral da base de membros da PIB Bady Bassitt
             </p>
           </div>
           <Link href="/membros">

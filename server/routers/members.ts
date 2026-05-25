@@ -210,7 +210,7 @@ export const membersRouter = router({
 
     await notifyOwner({
       title: `Novo cadastro: ${input.fullName}`,
-      content: `Um novo cadastro foi realizado na plataforma PIBB Bady Bassitt.\n\n• Nome: ${input.fullName}\n• Telefone: ${input.phone || "—"}\n• Congregação: ${input.congregation || "—"}\n• Ministério: ${input.ministry || "—"}\n• Classificação: ${memberType.replace("_", " ")}${spouseInfo}${childrenInfo}\n\n${isDuplicate ? "⚠️ ATENÇÃO: Possível duplicidade detectada (CPF ou telefone já cadastrado)." : ""}`,
+      content: `Um novo cadastro foi realizado na plataforma PIB Bady Bassitt.\n\n• Nome: ${input.fullName}\n• Telefone: ${input.phone || "—"}\n• Congregação: ${input.congregation || "—"}\n• Ministério: ${input.ministry || "—"}\n• Classificação: ${memberType.replace("_", " ")}${spouseInfo}${childrenInfo}\n\n${isDuplicate ? "⚠️ ATENÇÃO: Possível duplicidade detectada (CPF ou telefone já cadastrado)." : ""}`,
     });
 
     return { success: true, memberId: newMember.id, familyCode, memberType, isDuplicate };

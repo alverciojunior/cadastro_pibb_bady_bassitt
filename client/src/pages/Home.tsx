@@ -17,7 +17,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <img
               src={LOGO_URL}
-              alt="PIBB Bady Bassitt"
+              alt="PIB Bady Bassitt"
               className="h-16 w-auto object-contain"
             />
             <div>
