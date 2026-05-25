@@ -113,3 +113,18 @@
 ## Busca por Nome do Cônjuge
 - [x] Estender a busca na página Membros para incluir nome do cônjuge
 - [x] Atualizar placeholder da barra de busca para indicar busca por titular/cônjuge
+
+## Histórico de Alterações por Membro
+- [x] Criar tabela `member_updates` estendida para registrar todas as alterações
+- [x] Adicionar campos `fieldName`, `oldValue`, `newValue` para rastrear mudanças específicas
+- [x] Criar página de visualização do histórico no painel administrativo
+- [x] Exibir quem alterou, quando e quais campos foram modificados
+
+## Módulo de Frequência em Cultos
+- [x] Criar tabela `attendance_records` para registrar frequência
+- [x] Criar tabela `services` para cadastrar cultos/eventos
+- [x] Router tRPC para registrar frequência
+- [x] Router tRPC para listar frequência por membro
+- [x] Router tRPC para obter estatísticas de frequência
+- [x] Página de registro de frequência no painel administrativo
+- [x] Interface para visualizar e registrar frequência por culto/data

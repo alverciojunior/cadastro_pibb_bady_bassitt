@@ -185,6 +185,9 @@ export const memberUpdates = mysqlTable("member_updates", {
   updatedByUserId: int("updatedByUserId"),
   changeType: mysqlEnum("changeType", ["create", "update", "classify"]).notNull(),
   changeDescription: text("changeDescription"),
+  fieldName: varchar("fieldName", { length: 100 }),
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -204,3 +207,38 @@ export const adminUsers = mysqlTable("admin_users", {
 });
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = typeof adminUsers.$inferInsert;
+
+// ─── Services (Cultos/Eventos) ────────────────────────────────────────────────
+export const services = mysqlTable("services", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  dayOfWeek: mysqlEnum("dayOfWeek", ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"]).notNull(),
+  time: varchar("time", { length: 5 }),
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Service = typeof services.$inferSelect;
+export type InsertService = typeof services.$inferInsert;
+
+// ─── Attendance Records (Frequência em Cultos) ────────────────────────────────
+export const attendanceRecords = mysqlTable("attendance_records", {
+  id: int("id").autoincrement().primaryKey(),
+  memberId: int("memberId")
+    .notNull()
+    .references(() => members.id),
+  serviceId: int("serviceId")
+    .notNull()
+    .references(() => services.id),
+  attendanceDate: date("attendanceDate").notNull(),
+  isPresent: boolean("isPresent").notNull().default(true),
+  notes: text("notes"),
+  registeredByUserId: int("registeredByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AttendanceRecord = typeof attendanceRecords.$inferSelect;
+export type InsertAttendanceRecord = typeof attendanceRecords.$inferInsert;
