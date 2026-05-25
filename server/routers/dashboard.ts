@@ -168,35 +168,43 @@ export const dashboardRouter = router({
     const db = await getDb();
     if (!db) return [];
 
-    const result = await db
-      .select({
-        ageGroup: sql<string>`
-          CASE
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 12 THEN 'Criança (0-11)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 18 THEN 'Adolescente (12-17)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 30 THEN 'Jovem (18-29)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 45 THEN 'Adulto (30-44)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 60 THEN 'Adulto (45-59)'
-            ELSE 'Idoso (60+)'
-          END
-        `,
-        count: sql<number>`count(*)`,
-      })
+    // Busca birthDate de todos os membros ativos com data de nascimento
+    // e agrupa no lado do servidor para evitar incompatibilidades SQL
+    const rows = await db
+      .select({ birthDate: members.birthDate })
       .from(members)
-      .where(and(eq(members.isActive, true), sql`${members.birthDate} IS NOT NULL`))
-      .groupBy(sql`CASE
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 12 THEN 'Criança (0-11)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 18 THEN 'Adolescente (12-17)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 30 THEN 'Jovem (18-29)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 45 THEN 'Adulto (30-44)'
-            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 60 THEN 'Adulto (45-59)'
-            ELSE 'Idoso (60+)'
-          END`)
-      .orderBy(sql`MIN(TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()))`);
+      .where(and(eq(members.isActive, true), sql`${members.birthDate} IS NOT NULL`));
 
-    return result.map((r) => ({
-      name: r.ageGroup,
-      value: Number(r.count),
+    const ORDER = [
+      'Criança (0-11)',
+      'Adolescente (12-17)',
+      'Jovem (18-29)',
+      'Adulto (30-44)',
+      'Adulto (45-59)',
+      'Idoso (60+)',
+    ];
+
+    const counts: Record<string, number> = {};
+    const now = new Date();
+    for (const row of rows) {
+      if (!row.birthDate) continue;
+      const birth = new Date(row.birthDate);
+      let age = now.getFullYear() - birth.getFullYear();
+      const m = now.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+      let label: string;
+      if (age < 12) label = 'Criança (0-11)';
+      else if (age < 18) label = 'Adolescente (12-17)';
+      else if (age < 30) label = 'Jovem (18-29)';
+      else if (age < 45) label = 'Adulto (30-44)';
+      else if (age < 60) label = 'Adulto (45-59)';
+      else label = 'Idoso (60+)';
+      counts[label] = (counts[label] ?? 0) + 1;
+    }
+
+    return ORDER.filter((o) => counts[o]).map((name) => ({
+      name,
+      value: counts[name],
     }));
   }),
 
@@ -205,25 +213,31 @@ export const dashboardRouter = router({
     const db = await getDb();
     if (!db) return [];
 
-    const result = await db
-      .select({
-        month: sql<string>`DATE_FORMAT(${members.createdAt}, '%Y-%m')`,
-        count: sql<number>`count(*)`,
-      })
+    // Busca createdAt e agrupa por mês no servidor para evitar incompatibilidades SQL
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 12);
+
+    const rows = await db
+      .select({ createdAt: members.createdAt })
       .from(members)
       .where(
         and(
           eq(members.isActive, true),
-          sql`${members.createdAt} >= DATE_SUB(NOW(), INTERVAL 12 MONTH)`
+          sql`${members.createdAt} >= ${cutoff.toISOString().slice(0, 10)}`
         )
-      )
-      .groupBy(sql`DATE_FORMAT(${members.createdAt}, '%Y-%m')`)
-      .orderBy(sql`DATE_FORMAT(${members.createdAt}, '%Y-%m') ASC`);
+      );
 
-    return result.map((r) => ({
-      month: r.month,
-      count: Number(r.count),
-    }));
+    const counts: Record<string, number> = {};
+    for (const row of rows) {
+      if (!row.createdAt) continue;
+      const d = new Date(row.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, count]) => ({ month, count }));
   }),
 
   // Aniversariantes do mês atual
