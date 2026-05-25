@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 const MEMBER_TYPE_LABELS: Record<string, string> = {
   membro_ativo: "Família Ativa",
-  frequentante: "Frequentante",
+  frequentante: "Família Frequentante",
   visitante: "Visitante",
   afastado: "Afastado",
 };
@@ -100,7 +100,7 @@ export default function Membros() {
                 <SelectContent>
                   <SelectItem value="all">Todas as situações</SelectItem>
                   <SelectItem value="membro_ativo">Família Ativa</SelectItem>
-                  <SelectItem value="frequentante">Frequentante</SelectItem>
+                  <SelectItem value="frequentante">Família Frequentante</SelectItem>
                   <SelectItem value="visitante">Visitante</SelectItem>
                   <SelectItem value="afastado">Afastado</SelectItem>
                 </SelectContent>
