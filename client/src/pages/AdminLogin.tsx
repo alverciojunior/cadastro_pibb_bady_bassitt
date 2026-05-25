@@ -36,9 +36,11 @@ export default function AdminLogin() {
 
   const loginMutation = trpc.adminAuth.login.useMutation({
     onSuccess: async (data) => {
-      await utils.adminAuth.me.invalidate();
       toast.success(`Bem-vindo(a), ${data.name}!`);
-      navigate("/dashboard");
+      // Usar window.location para forçar reload completo e garantir que o cookie seja lido
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 800);
     },
     onError: (err) => {
       setError(err.message || "Usuário ou senha inválidos");
