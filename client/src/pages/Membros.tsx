@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 
 const MEMBER_TYPE_LABELS: Record<string, string> = {
-  membro_ativo: "Membro Ativo",
+  membro_ativo: "Família Ativa",
   frequentante: "Frequentante",
   visitante: "Visitante",
   afastado: "Afastado",
@@ -64,7 +64,7 @@ export default function Membros() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-primary">Membros</h1>
+            <h1 className="text-2xl font-serif font-bold text-primary">Famílias</h1>
             <p className="text-muted-foreground">
               {data?.total ?? 0} registro(s) encontrado(s)
             </p>
@@ -99,7 +99,7 @@ export default function Membros() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as situações</SelectItem>
-                  <SelectItem value="membro_ativo">Membro Ativo</SelectItem>
+                  <SelectItem value="membro_ativo">Família Ativa</SelectItem>
                   <SelectItem value="frequentante">Frequentante</SelectItem>
                   <SelectItem value="visitante">Visitante</SelectItem>
                   <SelectItem value="afastado">Afastado</SelectItem>

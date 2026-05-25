@@ -28,7 +28,7 @@ import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: Users, label: "Membros", path: "/membros" },
+  { icon: Users, label: "Famílias", path: "/membros" },
   { icon: ClipboardList, label: "Novo Cadastro", path: "/cadastro" },
   { icon: MessageCircle, label: "WhatsApp", path: "/whatsapp" },
   { icon: History, label: "Histórico WA", path: "/whatsapp/historico" },
