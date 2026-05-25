@@ -184,7 +184,14 @@ export const dashboardRouter = router({
       })
       .from(members)
       .where(and(eq(members.isActive, true), sql`${members.birthDate} IS NOT NULL`))
-      .groupBy(sql`ageGroup`)
+      .groupBy(sql`CASE
+            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 12 THEN 'Criança (0-11)'
+            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 18 THEN 'Adolescente (12-17)'
+            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 30 THEN 'Jovem (18-29)'
+            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 45 THEN 'Adulto (30-44)'
+            WHEN TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()) < 60 THEN 'Adulto (45-59)'
+            ELSE 'Idoso (60+)'
+          END`)
       .orderBy(sql`MIN(TIMESTAMPDIFF(YEAR, ${members.birthDate}, CURDATE()))`);
 
     return result.map((r) => ({
@@ -211,7 +218,7 @@ export const dashboardRouter = router({
         )
       )
       .groupBy(sql`DATE_FORMAT(${members.createdAt}, '%Y-%m')`)
-      .orderBy(sql`DATE_FORMAT(${members.createdAt}, '%Y-%m')`);
+      .orderBy(sql`DATE_FORMAT(${members.createdAt}, '%Y-%m') ASC`);
 
     return result.map((r) => ({
       month: r.month,
