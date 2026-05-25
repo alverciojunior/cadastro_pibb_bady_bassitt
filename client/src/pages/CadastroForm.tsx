@@ -419,7 +419,7 @@ function Step1({ formData, updateField }: { formData: Partial<FormData>; updateF
             </Select>
           </FormField>
 
-          <FormField label="CPF (opcional)">
+          <FormField label="CPF:">
             <Input
               placeholder="000.000.000-00"
               value={formData.cpf || ""}
