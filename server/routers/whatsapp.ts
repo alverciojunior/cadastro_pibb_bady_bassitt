@@ -2,8 +2,8 @@ import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
-import { whatsappConfig } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { whatsappConfig, whatsappMessages } from "../../drizzle/schema";
+import { eq, desc, and, gte, like, or } from "drizzle-orm";
 import { parse as parseCookie } from "cookie";
 import { COOKIE_NAME } from "@shared/const";
 import { createHeartbeatJob, deleteHeartbeatJob } from "../_core/heartbeat";
@@ -32,7 +32,17 @@ async function evolutionRequest(
   return res.json().catch(() => ({}));
 }
 
-export async function sendWhatsAppMessage(phone: string, message: string): Promise<boolean> {
+interface SendOptions {
+  memberId?: number;
+  memberName?: string;
+  messageType?: string; // welcome | update | birthday | test | leadership
+}
+
+export async function sendWhatsAppMessage(
+  phone: string,
+  message: string,
+  opts: SendOptions = {}
+): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -43,6 +53,9 @@ export async function sendWhatsAppMessage(phone: string, message: string): Promi
   // Normaliza o número: remove tudo que não é dígito, garante código do país
   const normalized = phone.replace(/\D/g, "");
   const withCountry = normalized.startsWith("55") ? normalized : `55${normalized}`;
+
+  let success = false;
+  let errorMsg: string | undefined;
 
   try {
     await evolutionRequest(
@@ -56,11 +69,24 @@ export async function sendWhatsAppMessage(phone: string, message: string): Promi
         options: { delay: 1200 },
       }
     );
-    return true;
-  } catch (err) {
+    success = true;
+  } catch (err: any) {
     console.error("[WhatsApp] Failed to send message:", err);
-    return false;
+    errorMsg = err?.message || "Erro desconhecido";
   }
+
+  // Registrar no histórico (não bloqueia o retorno)
+  db.insert(whatsappMessages).values({
+    memberId: opts.memberId ?? null,
+    memberName: opts.memberName ?? null,
+    phone: withCountry,
+    messageType: opts.messageType ?? "manual",
+    messageContent: message,
+    status: success ? "sent" : "failed",
+    errorMessage: errorMsg ?? null,
+  }).catch((e) => console.error("[WhatsApp] Failed to log message:", e));
+
+  return success;
 }
 
 // ─── Router ───────────────────────────────────────────────────────────────────
@@ -216,7 +242,7 @@ export const whatsappRouter = router({
   sendTest: protectedProcedure
     .input(z.object({ phone: z.string(), message: z.string() }))
     .mutation(async ({ input }) => {
-      const ok = await sendWhatsAppMessage(input.phone, input.message);
+      const ok = await sendWhatsAppMessage(input.phone, input.message, { messageType: "test", memberName: "Teste Manual" });
       if (!ok) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Falha ao enviar mensagem. Verifique se o WhatsApp está conectado." });
       return { success: true };
     }),
@@ -271,4 +297,84 @@ export const whatsappRouter = router({
         return { success: true, message: "Notificações de aniversariantes desativadas." };
       }
     }),
+
+  // Histórico de mensagens enviadas
+  messageHistory: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(30),
+        status: z.enum(["all", "sent", "failed"]).default("all"),
+        messageType: z.string().optional(),
+        search: z.string().optional(),
+        dateFrom: z.string().optional(), // ISO date string
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const conditions: any[] = [];
+
+      if (input.status !== "all") {
+        conditions.push(eq(whatsappMessages.status, input.status));
+      }
+      if (input.messageType && input.messageType !== "all") {
+        conditions.push(eq(whatsappMessages.messageType, input.messageType));
+      }
+      if (input.search) {
+        conditions.push(
+          or(
+            like(whatsappMessages.memberName, `%${input.search}%`),
+            like(whatsappMessages.phone, `%${input.search}%`)
+          )
+        );
+      }
+      if (input.dateFrom) {
+        conditions.push(gte(whatsappMessages.sentAt, new Date(input.dateFrom)));
+      }
+
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const [rows, countRows] = await Promise.all([
+        db
+          .select()
+          .from(whatsappMessages)
+          .where(whereClause)
+          .orderBy(desc(whatsappMessages.sentAt))
+          .limit(input.pageSize)
+          .offset((input.page - 1) * input.pageSize),
+        db
+          .select({ count: whatsappMessages.id })
+          .from(whatsappMessages)
+          .where(whereClause),
+      ]);
+
+      return {
+        messages: rows,
+        total: countRows.length,
+        page: input.page,
+        pageSize: input.pageSize,
+        totalPages: Math.ceil(countRows.length / input.pageSize),
+      };
+    }),
+
+  // Estatísticas rápidas do histórico
+  messageStats: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+    const all = await db.select({ status: whatsappMessages.status, messageType: whatsappMessages.messageType }).from(whatsappMessages);
+
+    const total = all.length;
+    const sent = all.filter((m) => m.status === "sent").length;
+    const failed = all.filter((m) => m.status === "failed").length;
+
+    const byType: Record<string, number> = {};
+    for (const m of all) {
+      byType[m.messageType] = (byType[m.messageType] || 0) + 1;
+    }
+
+    return { total, sent, failed, byType };
+  }),
 });

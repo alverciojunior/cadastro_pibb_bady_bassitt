@@ -230,7 +230,11 @@ export const membersRouter = router({
           const welcomeMsg = waCfg.welcomeMessage
             ? waCfg.welcomeMessage.replace("{nome}", firstName).replace("{name}", firstName)
             : `Olá, *${firstName}*! 😊\n\nSeu cadastro na *PIB Bady Bassitt* foi realizado com sucesso! 🙏\n\nEstamos muito felizes em ter você registrado(a) em nossa família. Que Deus abençoe sua vida!\n\n_PIB Bady Bassitt_`;
-          await sendWhatsAppMessage(phoneForWA, welcomeMsg);
+          await sendWhatsAppMessage(phoneForWA, welcomeMsg, {
+            memberId: newMember.id,
+            memberName: input.fullName,
+            messageType: "welcome",
+          });
         } catch (err) {
           console.error("[WhatsApp] Erro ao enviar boas-vindas:", err);
         }
@@ -331,7 +335,11 @@ export const membersRouter = router({
             if (!waCfg || !waCfg.isConnected || !waCfg.welcomeMessageEnabled) return;
             const firstName = input.data.fullName.split(" ")[0];
             const updateMsg = `Olá, *${firstName}*! 🙏\n\nSeu cadastro na *PIB Bady Bassitt* foi atualizado com sucesso!\n\nSe precisar de algo, estamos à disposição.\n\n_PIB Bady Bassitt_`;
-            await sendWhatsAppMessage(phoneForWA, updateMsg);
+            await sendWhatsAppMessage(phoneForWA, updateMsg, {
+              memberId: input.id,
+              memberName: input.data.fullName,
+              messageType: "update",
+            });
           } catch (err) {
             console.error("[WhatsApp] Erro ao enviar notificação de atualização:", err);
           }

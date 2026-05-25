@@ -75,3 +75,10 @@
 - [x] Heartbeat cron diário: notificação de aniversáriantes para a liderança
 - [x] Endpoint /api/scheduled/birthday-notifications para o cron
 - [x] Página de configuração WhatsApp no painel administrativo
+
+## Histórico de Mensagens WhatsApp
+- [x] Tabela `whatsapp_messages` para registrar todos os disparos
+- [x] Registrar envio no histórico em todos os pontos de disparo (boas-vindas, atualização, aniversário, teste)
+- [x] Router tRPC: listar histórico com filtros e paginação
+- [x] Página de histórico de mensagens no painel administrativo
+- [x] Item de menu "Histórico" na seção WhatsApp do sidebar

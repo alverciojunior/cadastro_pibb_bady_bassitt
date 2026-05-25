@@ -70,7 +70,11 @@ export async function birthdayNotificationsHandler(req: Request, res: Response) 
           config.birthdayMessage ||
           `🎂 *Feliz Aniversário, ${member.fullName.split(" ")[0]}!*\n\nA família da PIB Bady Bassitt deseja a você um dia muito abençoado! Que Deus continue te guiando e abençoando sua vida. 🙏\n\n_Com carinho, PIB Bady Bassitt_`;
 
-        const ok = await sendWhatsAppMessage(phone, message);
+        const ok = await sendWhatsAppMessage(phone, message, {
+          memberId: member.id,
+          memberName: member.fullName,
+          messageType: "birthday",
+        });
         if (ok) whatsappSent++;
       }
 
@@ -78,7 +82,10 @@ export async function birthdayNotificationsHandler(req: Request, res: Response) 
       if (config.leadershipPhone) {
         const leaderMsg =
           `📋 *Aniversariantes de hoje — ${now.toLocaleDateString("pt-BR")}*\n\n${birthdayList}\n\nTotal: ${todayBirthdays.length} aniversariante(s)`;
-        await sendWhatsAppMessage(config.leadershipPhone, leaderMsg);
+        await sendWhatsAppMessage(config.leadershipPhone, leaderMsg, {
+          messageType: "leadership",
+          memberName: "Liderança",
+        });
         leadershipNotified = true;
       }
     }

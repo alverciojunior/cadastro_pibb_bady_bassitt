@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "wouter";
 import {
   MessageCircle,
   Wifi,
@@ -24,6 +25,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
+  History,
 } from "lucide-react";
 
 const configSchema = z.object({
@@ -146,6 +148,12 @@ export default function WhatsappConfig() {
             {isConnected ? "Conectado" : "Desconectado"}
           </Badge>
         )}
+        <Link href="/whatsapp/historico">
+          <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+            <History size={15} />
+            Ver Histórico
+          </Button>
+        </Link>
       </div>
 
       {/* Aviso sobre deploy */}

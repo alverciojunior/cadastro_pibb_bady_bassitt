@@ -46,6 +46,22 @@ export const whatsappConfig = mysqlTable("whatsapp_config", {
 export type WhatsappConfig = typeof whatsappConfig.$inferSelect;
 export type InsertWhatsappConfig = typeof whatsappConfig.$inferInsert;
 
+// WhatsApp message history table
+export const whatsappMessages = mysqlTable("whatsapp_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  memberId: int("memberId"),
+  memberName: varchar("memberName", { length: 255 }),
+  phone: varchar("phone", { length: 30 }).notNull(),
+  messageType: varchar("messageType", { length: 50 }).notNull(), // welcome, update, birthday, test, leadership
+  messageContent: text("messageContent").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("sent"), // sent, failed
+  errorMessage: text("errorMessage"),
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+});
+
+export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
+export type InsertWhatsappMessage = typeof whatsappMessages.$inferInsert;
+
 // ─── Families ────────────────────────────────────────────────────────────────
 export const families = mysqlTable("families", {
   id: int("id").autoincrement().primaryKey(),

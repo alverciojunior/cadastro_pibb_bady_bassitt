@@ -11,6 +11,7 @@ import Membros from "./pages/Membros";
 import MembroDetalhe from "./pages/MembroDetalhe";
 import MembroEditar from "./pages/MembroEditar";
 import WhatsappConfig from "./pages/WhatsappConfig";
+import WhatsappHistorico from "./pages/WhatsappHistorico";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/membros/:id" component={MembroDetalhe} />
       <Route path="/membros/:id/editar" component={MembroEditar} />
       <Route path="/whatsapp" component={WhatsappConfig} />
+      <Route path="/whatsapp/historico" component={WhatsappHistorico} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
