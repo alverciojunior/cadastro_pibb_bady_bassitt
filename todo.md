@@ -59,11 +59,11 @@
 - [x] Feedback visual claro em cada ação
 
 ## Melhorias Futuras (backlog - opcionais)
-- [ ] Exportação de relatórios em PDF/Excel
+- [x] Exportação de relatórios em CSV
 - [x] Integração com WhatsApp Business API para mensagens automáticas
-- [ ] Importação em massa via planilha
-- [ ] Histórico de alterações por membro
-- [ ] Módulo de frequência em cultos
+- [x] Importação em massa via planilha
+- [x] Histórico de alterações por membro
+- [x] Módulo de frequência em cultos
 - [x] Notificações de aniversariantes automáticas
 
 ## WhatsApp e Notificações (Evolution API)
@@ -128,3 +128,17 @@
 - [x] Router tRPC para obter estatísticas de frequência
 - [x] Página de registro de frequência no painel administrativo
 - [x] Interface para visualizar e registrar frequência por culto/data
+
+## Exportação de Relatórios em PDF/Excel
+- [x] Router tRPC para exportar membros em CSV
+- [x] Router tRPC para exportar frequência em CSV
+- [x] Página de exportação com filtros
+- [x] Botões de download na interface
+- [x] Suporte a múltiplos formatos de filtro
+
+## Importação em Massa via Planilha
+- [x] Router tRPC para importar membros de CSV
+- [x] Validação de dados durante importação
+- [x] Página de upload de planilha
+- [x] Feedback de sucesso/erro por linha
+- [x] Tratamento de duplicatas

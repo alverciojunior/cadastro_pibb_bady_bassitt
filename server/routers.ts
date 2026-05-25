@@ -8,6 +8,8 @@ import { whatsappRouter } from "./routers/whatsapp";
 import { adminAuthRouter } from "./routers/adminAuth";
 import { historyRouter } from "./routers/history";
 import { attendanceRouter } from "./routers/attendance";
+import { exportRouter } from "./routers/export";
+import { importRouter } from "./routers/import";
 
 export const appRouter = router({
   system: systemRouter,
@@ -25,6 +27,8 @@ export const appRouter = router({
   adminAuth: adminAuthRouter,
   history: historyRouter,
   attendance: attendanceRouter,
+  export: exportRouter,
+  import: importRouter,
 });
 
 export type AppRouter = typeof appRouter;
