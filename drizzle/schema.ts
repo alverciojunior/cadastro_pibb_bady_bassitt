@@ -1,17 +1,18 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import {
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+  date,
+  boolean,
+  tinyint,
+} from "drizzle-orm/mysql-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
+// ─── Users (Auth) ────────────────────────────────────────────────────────────
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,4 +26,126 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// ─── Families ────────────────────────────────────────────────────────────────
+export const families = mysqlTable("families", {
+  id: int("id").autoincrement().primaryKey(),
+  familyCode: varchar("familyCode", { length: 32 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Family = typeof families.$inferSelect;
+export type InsertFamily = typeof families.$inferInsert;
+
+// ─── Members ─────────────────────────────────────────────────────────────────
+export const members = mysqlTable("members", {
+  id: int("id").autoincrement().primaryKey(),
+  familyId: int("familyId").references(() => families.id),
+
+  // Dados pessoais
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  birthDate: date("birthDate"),
+  gender: mysqlEnum("gender", ["masculino", "feminino", "outro"]),
+  maritalStatus: mysqlEnum("maritalStatus", [
+    "solteiro",
+    "casado",
+    "uniao_estavel",
+    "divorciado",
+    "viuvo",
+  ]),
+  cpf: varchar("cpf", { length: 14 }),
+
+  // Contato
+  phone: varchar("phone", { length: 20 }),
+  whatsapp: varchar("whatsapp", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+
+  // Endereço
+  street: varchar("street", { length: 255 }),
+  number: varchar("number", { length: 20 }),
+  complement: varchar("complement", { length: 100 }),
+  neighborhood: varchar("neighborhood", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 2 }),
+  zipCode: varchar("zipCode", { length: 10 }),
+
+  // Dados da Igreja
+  congregation: varchar("congregation", { length: 100 }),
+  ministry: varchar("ministry", { length: 100 }),
+  isBaptized: boolean("isBaptized").default(false),
+  baptismDate: date("baptismDate"),
+  isTither: mysqlEnum("isTither", ["sim", "nao", "ocasional"]),
+  attendanceFrequency: mysqlEnum("attendanceFrequency", [
+    "sempre",
+    "quase_sempre",
+    "as_vezes",
+    "raramente",
+    "nunca",
+  ]),
+  serviceArea: varchar("serviceArea", { length: 255 }),
+  gifts: text("gifts"),
+
+  // Cônjuge
+  spouseName: varchar("spouseName", { length: 255 }),
+  spouseBirthDate: date("spouseBirthDate"),
+  spousePhone: varchar("spousePhone", { length: 20 }),
+  spouseWhatsapp: varchar("spouseWhatsapp", { length: 20 }),
+  spouseEmail: varchar("spouseEmail", { length: 320 }),
+  spouseIsBaptized: boolean("spouseIsBaptized").default(false),
+  spouseMinistry: varchar("spouseMinistry", { length: 100 }),
+  spouseServiceArea: varchar("spouseServiceArea", { length: 255 }),
+
+  // Classificação
+  memberType: mysqlEnum("memberType", [
+    "membro_ativo",
+    "frequentante",
+    "visitante",
+    "afastado",
+  ]).default("visitante"),
+
+  // Observações pastorais
+  pastoralNotes: text("pastoralNotes"),
+  aiPastoralSuggestions: text("aiPastoralSuggestions"),
+
+  // Controle
+  hasDuplicate: boolean("hasDuplicate").default(false),
+  isActive: boolean("isActive").default(true),
+  registeredByUserId: int("registeredByUserId"),
+  lastUpdatedByUserId: int("lastUpdatedByUserId"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Member = typeof members.$inferSelect;
+export type InsertMember = typeof members.$inferInsert;
+
+// ─── Member Children ──────────────────────────────────────────────────────────
+export const memberChildren = mysqlTable("member_children", {
+  id: int("id").autoincrement().primaryKey(),
+  memberId: int("memberId")
+    .notNull()
+    .references(() => members.id),
+  familyId: int("familyId").references(() => families.id),
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  birthDate: date("birthDate"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MemberChild = typeof memberChildren.$inferSelect;
+export type InsertMemberChild = typeof memberChildren.$inferInsert;
+
+// ─── Member Updates (Audit Log) ───────────────────────────────────────────────
+export const memberUpdates = mysqlTable("member_updates", {
+  id: int("id").autoincrement().primaryKey(),
+  memberId: int("memberId")
+    .notNull()
+    .references(() => members.id),
+  updatedByUserId: int("updatedByUserId"),
+  changeType: mysqlEnum("changeType", ["create", "update", "classify"]).notNull(),
+  changeDescription: text("changeDescription"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MemberUpdate = typeof memberUpdates.$inferSelect;
+export type InsertMemberUpdate = typeof memberUpdates.$inferInsert;
