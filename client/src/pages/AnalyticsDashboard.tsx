@@ -131,25 +131,40 @@ export function AnalyticsDashboard() {
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribuição por Situação</h2>
           {(statusDistributionQuery.data?.length ?? 0) > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={statusDistributionQuery.data || []}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {(statusDistributionQuery.data || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="flex flex-col lg:flex-row gap-6">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={statusDistributionQuery.data || []}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {(statusDistributionQuery.data || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => `${value}`} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-col justify-center gap-3 min-w-[200px]">
+                {(statusDistributionQuery.data || []).map((entry, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="text-sm text-gray-700">
+                      {entry.name}: <span className="font-semibold">{entry.value}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500">
               <p>Sem dados de situação</p>
