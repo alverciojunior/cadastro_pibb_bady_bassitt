@@ -173,7 +173,7 @@ export const exportRouter = router({
 
       const csv = [
         headers.map((h) => `"${h}"`).join(","),
-        ...rows.map((r) => r.map((v) => `"${v}"`).join(",")),
+        ...rows.map((r: any[]) => r.map((v: any) => `"${v}"`).join(",")),
       ].join("\n");
 
       return {
@@ -226,7 +226,7 @@ export const exportRouter = router({
 
       const csv = [
         headers.map((h) => `"${h}"`).join(","),
-        ...rows.map((r) => r.map((v) => `"${v}"`).join(",")),
+        ...rows.map((r: any[]) => r.map((v: any) => `"${v}"`).join(",")),
       ].join("\n");
 
       return {

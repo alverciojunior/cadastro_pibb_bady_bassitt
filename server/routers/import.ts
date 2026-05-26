@@ -151,7 +151,7 @@ export const importRouter = router({
   validateImportData: pibbAdminProcedure
     .input(
       z.object({
-        data: z.array(z.record(z.any())),
+        data: z.array(z.record(z.string(), z.any())),
       })
     )
     .query(async ({ input }) => {
@@ -179,7 +179,7 @@ export const importRouter = router({
         }
 
         // Validar email se fornecido
-        if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) {
+        if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(row.email))) {
           results.errors.push({
             row: i + 1,
             error: "Email inválido",
@@ -190,7 +190,7 @@ export const importRouter = router({
         }
 
         // Validar CPF se fornecido (formato básico)
-        if (row.cpf && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(row.cpf)) {
+        if (row.cpf && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(String(row.cpf))) {
           results.errors.push({
             row: i + 1,
             error: "CPF deve estar no formato XXX.XXX.XXX-XX",
