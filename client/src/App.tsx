@@ -20,6 +20,7 @@ import Frequencia from "./pages/Frequencia";
 import Exportacao from "./pages/Exportacao";
 import Importacao from "./pages/Importacao";
 import DadosInvalidos from "./pages/DadosInvalidos";
+import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
 
 // Wrapper para rotas protegidas pelo AdminGuard
 function ProtectedDashboard() {
@@ -58,6 +59,9 @@ function ProtectedImportacao() {
 function ProtectedDadosInvalidos() {
   return <AdminGuard><DadosInvalidos /></AdminGuard>;
 }
+function ProtectedAnalyticsDashboard() {
+  return <AdminGuard><AnalyticsDashboard /></AdminGuard>;
+}
 
 function Router() {
   return (
@@ -80,6 +84,7 @@ function Router() {
       <Route path="/whatsapp" component={ProtectedWhatsappConfig} />
       <Route path="/whatsapp/historico" component={ProtectedWhatsappHistorico} />
       <Route path="/admin/usuarios" component={ProtectedAdminUsuarios} />
+      <Route path="/analytics" component={ProtectedAnalyticsDashboard} />
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

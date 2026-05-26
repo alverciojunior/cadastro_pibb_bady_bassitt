@@ -11,6 +11,7 @@ import { attendanceRouter } from "./routers/attendance";
 import { exportRouter } from "./routers/export";
 import { importRouter } from "./routers/import";
 import { duplicatesRouter } from "./routers/duplicates";
+import { analyticsRouter } from "./routers/analytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -31,6 +32,7 @@ export const appRouter = router({
   export: exportRouter,
   import: importRouter,
   duplicates: duplicatesRouter,
+  analytics: analyticsRouter,
 });
 
 export type AppRouter = typeof appRouter;

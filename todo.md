@@ -155,3 +155,16 @@
 - [x] Implementar regra de herança de telefone do titular
 - [x] Implementar regra de herança de telefone do cônjuge
 - [x] Testar herança automática
+
+
+## Dashboard com Gráficos Avançados
+- [x] Router tRPC para crescimento mensal de famílias (usando tabela families)
+- [x] Router tRPC para distribuição por ministério (inclui titular, cônjuge e filhos)
+- [x] Página de dashboard com gráficos visuais
+- [x] Gráfico de linha para crescimento mensal
+- [x] Gráfico de pizza para distribuição por situação
+- [x] Gráfico de barras para distribuição por ministério (horizontal)
+- [x] KPIs de resumo (total de famílias, novos este mês, crescimento percentual)
+- [x] Link "Análise" adicionado ao sidebar do dashboard
+- [x] Tratamento de erros e estados vazios nos gráficos
+- [x] Tabela de resumo de ministérios com percentuais
