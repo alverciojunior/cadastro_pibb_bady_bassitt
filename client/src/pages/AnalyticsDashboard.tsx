@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Spinner } from "@/components/ui/spinner";
 import { AlertCircle } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
 
 const COLORS = ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
 
@@ -30,30 +31,35 @@ export function AnalyticsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Spinner />
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-screen">
+          <Spinner />
+        </div>
+      </DashboardLayout>
     );
   }
 
   if (hasError) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Card className="p-6 max-w-md">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="w-6 h-6 text-red-600" />
-            <div>
-              <h2 className="font-semibold text-red-900">Erro ao carregar dados</h2>
-              <p className="text-sm text-red-700">Não foi possível carregar os dados de análise. Tente recarregar a página.</p>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-screen">
+          <Card className="p-6 max-w-md">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+              <div>
+                <h2 className="font-semibold text-red-900">Erro ao carregar dados</h2>
+                <p className="text-sm text-red-700">Não foi possível carregar os dados de análise. Tente recarregar a página.</p>
+              </div>
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard de Análise</h1>
@@ -231,5 +237,6 @@ export function AnalyticsDashboard() {
         )}
       </Card>
     </div>
+    </DashboardLayout>
   );
 }
