@@ -1,8 +1,9 @@
 import { router, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
-import { db } from "../db";
+import { getDb } from "../db";
 import { members } from "../../drizzle/schema";
 import { eq, or, and, ne } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 
 export const duplicatesRouter = router({
   /**
@@ -17,6 +18,9 @@ export const duplicatesRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
       if (!input.cpf && !input.phone) {
         return { isDuplicate: false, duplicateType: null, count: 0 };
       }
@@ -52,6 +56,9 @@ export const duplicatesRouter = router({
    * Lista membros com dados inválidos ou incompletos
    */
   getInvalidMembers: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
     const invalidMembers = await db
       .select({
         id: members.id,
@@ -110,6 +117,9 @@ export const duplicatesRouter = router({
    * Encontra membros com CPF ou telefone duplicados
    */
   getDuplicateMembers: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
     // Encontra CPFs duplicados
     const duplicateCPFs = await db
       .select({
