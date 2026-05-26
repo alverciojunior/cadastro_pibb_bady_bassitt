@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ChevronLeft, Save, Loader2 } from "lucide-react";
 import { Link } from "wouter";
+import { usePhoneMask } from "@/hooks/usePhoneMask";
 
 const CONGREGATIONS = [
   "Sede - Bady Bassitt",
@@ -41,6 +42,7 @@ function FormField({ label, required, children }: { label: string; required?: bo
 }
 
 export default function MembroEditar() {
+  const { formatPhone } = usePhoneMask();
   const { id } = useParams<{ id: string }>();
   const memberId = parseInt(id || "0");
   const [, navigate] = useLocation();
@@ -218,10 +220,10 @@ export default function MembroEditar() {
           <h2 className="text-lg font-semibold text-primary">Contato e Endereço</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Telefone">
-              <Input value={formData.phone || ""} onChange={(e) => set("phone", e.target.value)} className="h-11" />
+              <Input value={formData.phone || ""} onChange={(e) => set("phone", formatPhone(e.target.value))} className="h-11" />
             </FormField>
             <FormField label="WhatsApp">
-              <Input value={formData.whatsapp || ""} onChange={(e) => set("whatsapp", e.target.value)} className="h-11" />
+              <Input value={formData.whatsapp || ""} onChange={(e) => set("whatsapp", formatPhone(e.target.value))} className="h-11" />
             </FormField>
             <div className="sm:col-span-2">
               <FormField label="E-mail">
@@ -333,7 +335,7 @@ export default function MembroEditar() {
                 <Input type="date" value={formData.spouseBirthDate || ""} onChange={(e) => set("spouseBirthDate", e.target.value)} className="h-11" />
               </FormField>
               <FormField label="Telefone">
-                <Input value={formData.spousePhone || ""} onChange={(e) => set("spousePhone", e.target.value)} className="h-11" />
+                <Input value={formData.spousePhone || ""} onChange={(e) => set("spousePhone", formatPhone(e.target.value))} className="h-11" />
               </FormField>
               <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <Checkbox id="spouseIsBaptized" checked={formData.spouseIsBaptized ?? false} onCheckedChange={(v) => set("spouseIsBaptized", v)} className="w-5 h-5" />
@@ -422,7 +424,7 @@ export default function MembroEditar() {
                     value={child.phone || ""}
                     onChange={(e) => {
                       const updated = [...children];
-                      updated[idx] = { ...updated[idx], phone: e.target.value };
+                      updated[idx] = { ...updated[idx], phone: formatPhone(e.target.value) };
                       setChildren(updated);
                     }}
                     className="h-11"

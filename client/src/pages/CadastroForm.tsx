@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { usePhoneMask } from "@/hooks/usePhoneMask";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, User, Phone, Church,
   Heart, Baby, AlertCircle, Loader2, BookOpen
@@ -101,11 +102,12 @@ const STEPS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CadastroForm() {
+  const { formatPhone } = usePhoneMask();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [submitted, setSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
-  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
+  const [childrenFields, setChildrenFields] = useState<{ fullName: string; birthDate: string; phone: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
 
   const [formData, setFormData] = useState<Partial<FormData>>({
     isBaptized: false,
@@ -446,7 +448,7 @@ function Step2({ formData, updateField }: { formData: Partial<FormData>; updateF
             <Input
               placeholder="(17) 99999-9999"
               value={formData.phone || ""}
-              onChange={(e) => updateField("phone", e.target.value)}
+              onChange={(e) => updateField("phone", formatPhone(e.target.value))}
               className="h-12 text-base"
               type="tel"
             />
@@ -456,7 +458,7 @@ function Step2({ formData, updateField }: { formData: Partial<FormData>; updateF
             <Input
               placeholder="(17) 99999-9999"
               value={formData.whatsapp || ""}
-              onChange={(e) => updateField("whatsapp", e.target.value)}
+              onChange={(e) => updateField("whatsapp", formatPhone(e.target.value))}
               className="h-12 text-base"
               type="tel"
             />
@@ -728,7 +730,7 @@ function Step4({
               <Input
                 placeholder="(17) 99999-9999"
                 value={formData.spousePhone || ""}
-                onChange={(e) => updateField("spousePhone", e.target.value)}
+                onChange={(e) => updateField("spousePhone", formatPhone(e.target.value))}
                 className="h-12 text-base"
                 type="tel"
               />
@@ -738,7 +740,7 @@ function Step4({
               <Input
                 placeholder="(17) 99999-9999"
                 value={formData.spouseWhatsapp || ""}
-                onChange={(e) => updateField("spouseWhatsapp", e.target.value)}
+                onChange={(e) => updateField("spouseWhatsapp", formatPhone(e.target.value))}
                 className="h-12 text-base"
                 type="tel"
               />
@@ -894,7 +896,7 @@ function Step4({
                     type="tel"
                     placeholder="(XX) XXXXX-XXXX"
                     value={child.phone || ""}
-                    onChange={(e) => updateChild(idx, "phone", e.target.value)}
+                    onChange={(e) => updateChild(idx, "phone", formatPhone(e.target.value))}
                     className="h-12 text-base"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Se deixar em branco, herdara o telefone do titular</p>
