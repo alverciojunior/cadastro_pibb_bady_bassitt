@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { usePhoneMask } from "@/hooks/usePhoneMask";
 import { useCPFMask } from "@/hooks/useCPFMask";
+import { useDateMask } from "@/hooks/useDateMask";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, User, Phone, Church,
   Heart, Baby, AlertCircle, Loader2, BookOpen
@@ -105,6 +106,7 @@ const STEPS = [
 export default function CadastroForm() {
   const { formatPhone } = usePhoneMask();
   const { formatCPF, isValidCPF } = useCPFMask();
+  const { isValidFormattedDate } = useDateMask();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [submitted, setSubmitted] = useState(false);
@@ -183,6 +185,12 @@ export default function CadastroForm() {
 
     if (formData.cpf && formData.cpf.replace(/\D/g, "").length === 11 && !isValidCPF(formData.cpf)) {
       toast.error("CPF inválido. Por favor, verifique os dígitos.");
+      setStep(1);
+      return;
+    }
+
+    if (formData.birthDate && !isValidFormattedDate(formData.birthDate)) {
+      toast.error("Data de nascimento inválida. Por favor, verifique.");
       setStep(1);
       return;
     }

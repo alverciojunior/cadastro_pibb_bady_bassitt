@@ -10,6 +10,7 @@ import { historyRouter } from "./routers/history";
 import { attendanceRouter } from "./routers/attendance";
 import { exportRouter } from "./routers/export";
 import { importRouter } from "./routers/import";
+import { duplicatesRouter } from "./routers/duplicates";
 
 export const appRouter = router({
   system: systemRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   attendance: attendanceRouter,
   export: exportRouter,
   import: importRouter,
+  duplicates: duplicatesRouter,
 });
 
 export type AppRouter = typeof appRouter;
