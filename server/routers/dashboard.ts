@@ -455,7 +455,7 @@ export const dashboardRouter = router({
         id: memberChildren.id,
         fullName: memberChildren.fullName,
         birthDate: memberChildren.birthDate,
-        phone: sql<string | null>`NULL`,
+        phone: memberChildren.phone,
         whatsapp: sql<string | null>`NULL`,
         type: sql<string>`'filho'`,
       })
