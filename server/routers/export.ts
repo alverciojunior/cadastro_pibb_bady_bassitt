@@ -207,7 +207,7 @@ export const exportRouter = router({
         .leftJoin(members, eq(attendanceRecords.memberId, members.id))
         .leftJoin(services, eq(attendanceRecords.serviceId, services.id));
 
-      let query = baseQuery;
+      let query: any = baseQuery;
       if (input.serviceId) {
         query = baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId));
       }
