@@ -1,7 +1,7 @@
-import { router, publicProcedure } from "./../../server/_core/trpc";
+import { router, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
-import { db } from "./../../server/db";
-import { members } from "./../../drizzle/schema";
+import { db } from "../db";
+import { members } from "../../drizzle/schema";
 import { eq, or, and, ne } from "drizzle-orm";
 
 export const duplicatesRouter = router({
