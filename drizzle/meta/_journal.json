@@ -29,6 +29,13 @@
       "when": 1779742831544,
       "tag": "0003_wealthy_red_wolf",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1779800522999,
+      "tag": "0004_wooden_wrecker",
+      "breakpoints": true
     }
   ]
 }

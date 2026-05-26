@@ -167,6 +167,7 @@ export const memberChildren = mysqlTable("member_children", {
   familyId: int("familyId").references(() => families.id),
   fullName: varchar("fullName", { length: 255 }).notNull(),
   birthDate: date("birthDate"),
+  phone: varchar("phone", { length: 20 }),
   isBaptized: boolean("isBaptized").default(false),
   baptismDate: date("baptismDate"),
   ministry: varchar("ministry", { length: 100 }),

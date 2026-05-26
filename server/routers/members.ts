@@ -14,6 +14,7 @@ import { sendWhatsAppMessage } from "./whatsapp";
 const childSchema = z.object({
   fullName: z.string().min(2),
   birthDate: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
   isBaptized: z.boolean().optional().default(false),
   baptismDate: z.string().optional().nullable(),
   ministry: z.string().optional().nullable(),
@@ -189,19 +190,30 @@ export const membersRouter = router({
       .where(eq(members.familyId, family.id))
       .limit(1);
 
-    // Inserir filhos
+    // Inserir filhos com herança de telefone
     if (input.children && input.children.length > 0) {
       for (const child of input.children) {
+        // Herdar telefone do titular se não preenchido
+        const childPhone = child.phone || input.phone || null;
         await db.insert(memberChildren).values({
           memberId: newMember.id,
           familyId: family.id,
           fullName: child.fullName,
           birthDate: child.birthDate ? new Date(child.birthDate) : null,
+          phone: childPhone,
           isBaptized: child.isBaptized ?? false,
           baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
           ministry: child.ministry ?? null,
         });
       }
+    }
+
+    // Herdar telefone do titular para cônjuge se não preenchido
+    if (input.spouseName && !input.spousePhone) {
+      await db
+        .update(members)
+        .set({ spousePhone: input.phone || null })
+        .where(eq(members.id, newMember.id));
     }
 
     // Log de auditoria
@@ -307,21 +319,32 @@ export const membersRouter = router({
         })
         .where(eq(members.id, input.id));
 
-      // Atualizar filhos
+      // Atualizar filhos com herança de telefone
       await db.delete(memberChildren).where(eq(memberChildren.memberId, input.id));
       if (input.data.children && input.data.children.length > 0) {
         const [member] = await db.select().from(members).where(eq(members.id, input.id)).limit(1);
         for (const child of input.data.children) {
+          // Herdar telefone do titular se não preenchido
+          const childPhone = child.phone || input.data.phone || null;
           await db.insert(memberChildren).values({
             memberId: input.id,
             familyId: member.familyId,
             fullName: child.fullName,
             birthDate: child.birthDate ? new Date(child.birthDate) : null,
+            phone: childPhone,
             isBaptized: child.isBaptized ?? false,
             baptismDate: child.baptismDate ? new Date(child.baptismDate) : null,
             ministry: child.ministry ?? null,
           });
         }
+      }
+
+      // Herdar telefone do titular para cônjuge se não preenchido
+      if (input.data.spouseName && !input.data.spousePhone) {
+        await db
+          .update(members)
+          .set({ spousePhone: input.data.phone || null })
+          .where(eq(members.id, input.id));
       }
 
       await db.insert(memberUpdates).values({

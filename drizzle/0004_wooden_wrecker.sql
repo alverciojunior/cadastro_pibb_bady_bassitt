@@ -1,0 +1,1 @@
+ALTER TABLE `member_children` ADD `phone` varchar(20);

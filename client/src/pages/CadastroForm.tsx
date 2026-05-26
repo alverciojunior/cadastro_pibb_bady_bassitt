@@ -889,6 +889,16 @@ function Step4({
                     className="h-12 text-base"
                   />
                 </FormField>
+                <FormField label="Telefone (opcional)">
+                  <Input
+                    type="tel"
+                    placeholder="(XX) XXXXX-XXXX"
+                    value={child.phone || ""}
+                    onChange={(e) => updateChild(idx, "phone", e.target.value)}
+                    className="h-12 text-base"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Se deixar em branco, herdara o telefone do titular</p>
+                </FormField>
 
                 <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-blue-200">
                   <Checkbox

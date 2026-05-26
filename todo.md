@@ -148,3 +148,10 @@
 - [x] Implementar confirmação antes de excluir
 - [x] Criar router tRPC para exclusão de membro
 - [x] Excluir filhos e histórico de alterações associados
+
+## Telefone para Filhos e Herança
+- [x] Adicionar campo de telefone para filhos no schema
+- [x] Adicionar campo de telefone nos formulários de cadastro e edição
+- [x] Implementar regra de herança de telefone do titular
+- [x] Implementar regra de herança de telefone do cônjuge
+- [x] Testar herança automática

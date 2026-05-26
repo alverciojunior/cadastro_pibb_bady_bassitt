@@ -96,6 +96,7 @@ export default function MembroEditar() {
         (member.children || []).map((c: any) => ({
           fullName: c.fullName || "",
           birthDate: c.birthDate ? new Date(c.birthDate).toISOString().split("T")[0] : "",
+          phone: c.phone || "",
           isBaptized: c.isBaptized ?? false,
           baptismDate: c.baptismDate ? new Date(c.baptismDate).toISOString().split("T")[0] : "",
           ministry: (c as any).ministry || "",
@@ -130,6 +131,7 @@ export default function MembroEditar() {
         children: children.filter((c) => c.fullName.trim()).map((c) => ({
           fullName: c.fullName,
           birthDate: c.birthDate || null,
+          phone: c.phone || null,
           isBaptized: c.isBaptized ?? false,
           baptismDate: c.isBaptized ? c.baptismDate || null : null,
           ministry: c.ministry || null,
@@ -369,7 +371,7 @@ export default function MembroEditar() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setChildren([...children, { fullName: "", birthDate: "", isBaptized: false, baptismDate: "", ministry: "" }])}
+              onClick={() => setChildren([...children, { fullName: "", birthDate: "", phone: "", isBaptized: false, baptismDate: "", ministry: "" }])}
             >
               + Adicionar Filho
             </Button>
@@ -412,6 +414,20 @@ export default function MembroEditar() {
                     }}
                     className="h-11"
                   />
+                </FormField>
+                <FormField label="Telefone (opcional)">
+                  <Input
+                    type="tel"
+                    placeholder="(XX) XXXXX-XXXX"
+                    value={child.phone || ""}
+                    onChange={(e) => {
+                      const updated = [...children];
+                      updated[idx] = { ...updated[idx], phone: e.target.value };
+                      setChildren(updated);
+                    }}
+                    className="h-11"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Se deixar em branco, herdara o telefone do titular</p>
                 </FormField>
                 <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200">
                   <Checkbox
