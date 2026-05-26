@@ -72,7 +72,7 @@ export const exportRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-      let query = db
+      let baseQuery = db
         .select({
           memberName: members.fullName,
           serviceName: services.name,
@@ -84,13 +84,14 @@ export const exportRouter = router({
         .leftJoin(members, eq(attendanceRecords.memberId, members.id))
         .leftJoin(services, eq(attendanceRecords.serviceId, services.id));
 
+      let query: any = baseQuery;
       if (input.serviceId) {
-        query = query.where(eq(attendanceRecords.serviceId, input.serviceId));
+        query = baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId));
       }
 
       const result = await query;
 
-      return result.map((r) => ({
+      return result.map((r: any) => ({
         "Membro": r.memberName || "",
         "Culto": r.serviceName || "",
         "Data": r.attendanceDate ? new Date(r.attendanceDate).toLocaleDateString("pt-BR") : "",
