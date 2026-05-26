@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ChevronLeft, Save, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { usePhoneMask } from "@/hooks/usePhoneMask";
+import { useCPFMask } from "@/hooks/useCPFMask";
 
 const CONGREGATIONS = [
   "Sede - Bady Bassitt",
@@ -43,6 +44,7 @@ function FormField({ label, required, children }: { label: string; required?: bo
 
 export default function MembroEditar() {
   const { formatPhone } = usePhoneMask();
+  const { formatCPF, isValidCPF } = useCPFMask();
   const { id } = useParams<{ id: string }>();
   const memberId = parseInt(id || "0");
   const [, navigate] = useLocation();
@@ -120,6 +122,11 @@ export default function MembroEditar() {
   const showSpouse = formData.maritalStatus === "casado" || formData.maritalStatus === "uniao_estavel";
 
   const handleSave = () => {
+    if (formData.cpf && formData.cpf.replace(/\D/g, "").length === 11 && !isValidCPF(formData.cpf)) {
+      toast.error("CPF inválido. Por favor, verifique os dígitos.");
+      return;
+    }
+
     update.mutate({
       id: memberId,
       data: {
@@ -210,7 +217,14 @@ export default function MembroEditar() {
               </Select>
             </FormField>
             <FormField label="CPF">
-              <Input value={formData.cpf || ""} onChange={(e) => set("cpf", e.target.value)} className="h-11" placeholder="000.000.000-00" />
+              <div className="space-y-1">
+                <Input value={formData.cpf || ""} onChange={(e) => set("cpf", formatCPF(e.target.value))} className="h-11" placeholder="000.000.000-00" />
+                {formData.cpf && formData.cpf.replace(/\D/g, "").length === 11 && (
+                  <p className={`text-xs ${isValidCPF(formData.cpf) ? "text-green-600" : "text-red-600"}`}>
+                    {isValidCPF(formData.cpf) ? "✓ CPF válido" : "✗ CPF inválido"}
+                  </p>
+                )}
+              </div>
             </FormField>
           </div>
         </div>

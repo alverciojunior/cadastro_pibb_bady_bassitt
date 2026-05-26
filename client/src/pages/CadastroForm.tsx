@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { usePhoneMask } from "@/hooks/usePhoneMask";
+import { useCPFMask } from "@/hooks/useCPFMask";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, User, Phone, Church,
   Heart, Baby, AlertCircle, Loader2, BookOpen
@@ -103,6 +104,7 @@ const STEPS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CadastroForm() {
   const { formatPhone } = usePhoneMask();
+  const { formatCPF, isValidCPF } = useCPFMask();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const [submitted, setSubmitted] = useState(false);
@@ -175,6 +177,12 @@ export default function CadastroForm() {
   const handleSubmit = () => {
     if (!formData.fullName?.trim()) {
       toast.error("Por favor, informe seu nome completo.");
+      setStep(1);
+      return;
+    }
+
+    if (formData.cpf && formData.cpf.replace(/\D/g, "").length === 11 && !isValidCPF(formData.cpf)) {
+      toast.error("CPF inválido. Por favor, verifique os dígitos.");
       setStep(1);
       return;
     }
@@ -422,12 +430,19 @@ function Step1({ formData, updateField }: { formData: Partial<FormData>; updateF
           </FormField>
 
           <FormField label="CPF:">
-            <Input
-              placeholder="000.000.000-00"
-              value={formData.cpf || ""}
-              onChange={(e) => updateField("cpf", e.target.value)}
-              className="h-12 text-base"
-            />
+            <div className="space-y-1">
+              <Input
+                placeholder="000.000.000-00"
+                value={formData.cpf || ""}
+                onChange={(e) => updateField("cpf", formatCPF(e.target.value))}
+                className="h-12 text-base"
+              />
+              {formData.cpf && formData.cpf.replace(/\D/g, "").length === 11 && (
+                <p className={`text-xs ${isValidCPF(formData.cpf) ? "text-green-600" : "text-red-600"}`}>
+                  {isValidCPF(formData.cpf) ? "✓ CPF válido" : "✗ CPF inválido"}
+                </p>
+              )}
+            </div>
           </FormField>
         </div>
       </div>
