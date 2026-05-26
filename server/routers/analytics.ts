@@ -1,6 +1,6 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { members, member_children, families } from "../../drizzle/schema";
+import { members, memberChildren, families } from "../../drizzle/schema";
 import { eq, and, gte, lt, isNotNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -76,11 +76,11 @@ export const analyticsRouter = router({
     // Busca todos os filhos com ministério
     const allChildren = await db
       .select({
-        id: member_children.id,
-        ministry: member_children.ministry,
+        id: memberChildren.id,
+        ministry: memberChildren.ministry,
       })
-      .from(member_children)
-      .where(isNotNull(member_children.ministry));
+      .from(memberChildren)
+      .where(isNotNull(memberChildren.ministry));
 
     // Conta ministério dos filhos
     for (const child of allChildren) {
@@ -154,7 +154,7 @@ export const analyticsRouter = router({
     const allMembers = await db
       .select({
         id: members.id,
-        status: members.status,
+        memberType: members.memberType,
       })
       .from(members);
 
@@ -166,7 +166,16 @@ export const analyticsRouter = router({
     };
 
     for (const member of allMembers) {
-      const status = member.status || "Família Ativa";
+      let status = "Família Ativa";
+      if (member.memberType === "membro_ativo") {
+        status = "Família Ativa";
+      } else if (member.memberType === "frequentante") {
+        status = "Família Frequentante";
+      } else if (member.memberType === "visitante") {
+        status = "Família Visitante";
+      } else if (member.memberType === "afastado") {
+        status = "Família Afastada";
+      }
       if (status in distribution) {
         distribution[status]++;
       }
@@ -210,11 +219,11 @@ export const analyticsRouter = router({
     // Busca todos os filhos com ministério
     const allChildren = await db
       .select({
-        id: member_children.id,
-        ministry: member_children.ministry,
+        id: memberChildren.id,
+        ministry: memberChildren.ministry,
       })
-      .from(member_children)
-      .where(isNotNull(member_children.ministry));
+      .from(memberChildren)
+      .where(isNotNull(memberChildren.ministry));
 
     // Conta ministério dos filhos
     for (const child of allChildren) {
