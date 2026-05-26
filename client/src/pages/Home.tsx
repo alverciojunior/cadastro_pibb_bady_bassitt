@@ -151,7 +151,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-6 px-4 text-center text-sm">
         <p>© 2026 Primeira Igreja Batista de Bady Bassitt - SP</p>
-        <p className="mt-1">Sistema de Gestão de Membros</p>
+        <p className="mt-1">Sistema de Gestão de Membros - Departamento de Tecnologia PIB Bady</p>
       </footer>
     </div>
   );
