@@ -20,12 +20,16 @@ function isSecureRequest(req: any): boolean {
 }
 
 function getAdminCookieOptions(req: any) {
-  const secure = isSecureRequest(req);
+  // Em produção/preview, sempre usar secure=true e sameSite=none
+  // Em desenvolvimento local, usar secure=false e sameSite=lax
+  const isDev = process.env.NODE_ENV === "development";
+  const secure = isDev ? false : true;
+  const sameSite = isDev ? ("lax" as const) : ("none" as const);
+  
   return {
     httpOnly: true,
     secure,
-    // sameSite=none requer secure=true; em HTTP local usa lax
-    sameSite: (secure ? "none" : "lax") as "none" | "lax",
+    sameSite,
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   };
