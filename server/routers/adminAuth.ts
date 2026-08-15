@@ -20,11 +20,11 @@ function isSecureRequest(req: any): boolean {
 }
 
 function getAdminCookieOptions(req: any) {
-  // Em produção/preview, sempre usar secure=true e sameSite=none
-  // Em desenvolvimento local, usar secure=false e sameSite=lax
+  // O preview é servido por HTTPS mesmo quando o processo roda com NODE_ENV=development.
+  // Detectar o protocolo real evita que o navegador descarte o cookie de sessão.
   const isDev = process.env.NODE_ENV === "development";
-  const secure = isDev ? false : true;
-  const sameSite = isDev ? ("lax" as const) : ("none" as const);
+  const secure = isSecureRequest(req) || !isDev;
+  const sameSite = secure ? ("none" as const) : ("lax" as const);
   
   return {
     httpOnly: true,

@@ -18,15 +18,12 @@ export const exportRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-      let query = db.select().from(members);
-
-      if (input.filter === "ativos") {
-        query = query.where(eq(members.isActive, true));
-      } else if (input.filter === "inativos") {
-        query = query.where(eq(members.isActive, false));
-      }
-
-      const result = await query;
+      const result =
+        input.filter === "ativos"
+          ? await db.select().from(members).where(eq(members.isActive, true))
+          : input.filter === "inativos"
+            ? await db.select().from(members).where(eq(members.isActive, false))
+            : await db.select().from(members);
 
       // Formatar dados para exportação
       return result.map((m) => ({
@@ -84,12 +81,9 @@ export const exportRouter = router({
         .leftJoin(members, eq(attendanceRecords.memberId, members.id))
         .leftJoin(services, eq(attendanceRecords.serviceId, services.id));
 
-      let query: any = baseQuery;
-      if (input.serviceId) {
-        query = baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId));
-      }
-
-      const result = await query;
+      const result = input.serviceId
+        ? await baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId))
+        : await baseQuery;
 
       return result.map((r: any) => ({
         "Membro": r.memberName || "",
@@ -111,15 +105,12 @@ export const exportRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-      let query = db.select().from(members);
-
-      if (input.filter === "ativos") {
-        query = query.where(eq(members.isActive, true));
-      } else if (input.filter === "inativos") {
-        query = query.where(eq(members.isActive, false));
-      }
-
-      const result = await query;
+      const result =
+        input.filter === "ativos"
+          ? await db.select().from(members).where(eq(members.isActive, true))
+          : input.filter === "inativos"
+            ? await db.select().from(members).where(eq(members.isActive, false))
+            : await db.select().from(members);
 
       // Criar CSV
       const headers = [
@@ -208,16 +199,13 @@ export const exportRouter = router({
         .leftJoin(members, eq(attendanceRecords.memberId, members.id))
         .leftJoin(services, eq(attendanceRecords.serviceId, services.id));
 
-      let query: any = baseQuery;
-      if (input.serviceId) {
-        query = baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId));
-      }
-
-      const result = await query;
+      const result = input.serviceId
+        ? await baseQuery.where(eq(attendanceRecords.serviceId, input.serviceId))
+        : await baseQuery;
 
       const headers = ["Membro", "Culto", "Data", "Presença", "Observações"];
 
-      const rows = result.map((r) => [
+      const rows = result.map((r: (typeof result)[number]) => [
         r.memberName || "",
         r.serviceName || "",
         r.attendanceDate ? new Date(r.attendanceDate).toLocaleDateString("pt-BR") : "",

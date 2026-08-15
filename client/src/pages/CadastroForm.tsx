@@ -55,7 +55,7 @@ type FormData = {
   spouseIsTither: string;
   hasChildren: string;
   childrenCount: string;
-  children: { fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[];
+  children: { fullName: string; birthDate: string; phone: string; isBaptized: boolean; baptismDate: string; ministry: string }[];
 };
 
 const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
@@ -153,6 +153,7 @@ export default function CadastroForm() {
     const newChildren = Array.from({ length: num }, (_, i) => ({
       fullName: childrenFields[i]?.fullName || "",
       birthDate: childrenFields[i]?.birthDate || "",
+      phone: childrenFields[i]?.phone || "",
       isBaptized: childrenFields[i]?.isBaptized ?? false,
       baptismDate: childrenFields[i]?.baptismDate || "",
       ministry: childrenFields[i]?.ministry || "",
@@ -160,7 +161,7 @@ export default function CadastroForm() {
     setChildrenFields(newChildren);
   };
 
-  const updateChild = (index: number, field: "fullName" | "birthDate" | "isBaptized" | "baptismDate" | "ministry", value: string | boolean) => {
+  const updateChild = (index: number, field: "fullName" | "birthDate" | "phone" | "isBaptized" | "baptismDate" | "ministry", value: string | boolean) => {
     const updated = [...childrenFields];
     updated[index] = { ...updated[index], [field]: value };
     setChildrenFields(updated);
@@ -381,6 +382,8 @@ export default function CadastroForm() {
 
 // ─── Step 1: Dados Pessoais ───────────────────────────────────────────────────
 function Step1({ formData, updateField }: { formData: Partial<FormData>; updateField: any }) {
+  const { formatCPF, isValidCPF } = useCPFMask();
+
   return (
     <div className="space-y-5">
       <div className="form-card p-6">
@@ -460,6 +463,8 @@ function Step1({ formData, updateField }: { formData: Partial<FormData>; updateF
 
 // ─── Step 2: Contato e Endereço ───────────────────────────────────────────────
 function Step2({ formData, updateField }: { formData: Partial<FormData>; updateField: any }) {
+  const { formatPhone } = usePhoneMask();
+
   return (
     <div className="space-y-5">
       <div className="form-card p-6">
@@ -717,6 +722,8 @@ function Step4({
   updateChild,
   handleChildrenCountChange,
 }: any) {
+  const { formatPhone } = usePhoneMask();
+
   return (
     <div className="space-y-5">
       {/* Cônjuge */}

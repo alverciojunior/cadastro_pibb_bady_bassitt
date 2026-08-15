@@ -168,3 +168,11 @@
 - [x] Link "Análise" adicionado ao sidebar do dashboard
 - [x] Tratamento de erros e estados vazios nos gráficos
 - [x] Tabela de resumo de ministérios com percentuais
+
+
+## Correção de Login — 2026-08-15
+- [x] Corrigir erro de credenciais inválidas no login administrativo e validar a senha padrão existente
+- [x] Remover script temporário de seed de admin após a correção
+- [x] Adicionar teste automatizado para validação do login administrativo
+- [x] Corrigir a política de cookie usando HTTPS detectado no preview
+- [x] Verificar saúde do servidor e salvar checkpoint da correção

@@ -2,7 +2,7 @@ import { router, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 import { members } from "../../drizzle/schema";
-import { eq, or, and, ne } from "drizzle-orm";
+import { eq, or, and, ne, count, gt, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const duplicatesRouter = router({
@@ -35,14 +35,13 @@ export const duplicatesRouter = router({
         conditions.push(eq(members.phone, input.phone));
       }
 
-      let query = db.select({ id: members.id }).from(members).where(or(...conditions));
-
-      // Se é edição, exclui o próprio membro
-      if (input.memberId) {
-        query = query.where(ne(members.id, input.memberId)) as any;
-      }
-
-      const results = await query;
+      const duplicateCondition = input.memberId
+        ? and(or(...conditions), ne(members.id, input.memberId))
+        : or(...conditions);
+      const results = await db
+        .select({ id: members.id })
+        .from(members)
+        .where(duplicateCondition);
 
       if (results.length > 0) {
         const duplicateType = input.cpf ? "cpf" : "phone";
@@ -124,23 +123,23 @@ export const duplicatesRouter = router({
     const duplicateCPFs = await db
       .select({
         cpf: members.cpf,
-        count: db.fn.count(members.id),
+        count: count(members.id),
       })
       .from(members)
       .where(ne(members.cpf, ""))
       .groupBy(members.cpf)
-      .having((h) => h.count > 1) as any;
+      .having(gt(count(members.id), 1));
 
     // Encontra telefones duplicados
     const duplicatePhones = await db
       .select({
         phone: members.phone,
-        count: db.fn.count(members.id),
+        count: count(members.id),
       })
       .from(members)
       .where(ne(members.phone, ""))
       .groupBy(members.phone)
-      .having((h) => h.count > 1) as any;
+      .having(gt(count(members.id), 1));
 
     // Busca os membros com esses CPFs/telefones duplicados
     const cpfsToFind = duplicateCPFs.map((d: any) => d.cpf);
@@ -152,7 +151,7 @@ export const duplicatesRouter = router({
       const cpfMatches = await db
         .select()
         .from(members)
-        .where(members.cpf.inArray(cpfsToFind));
+        .where(inArray(members.cpf, cpfsToFind));
       duplicateMembers = [...duplicateMembers, ...cpfMatches];
     }
 
@@ -160,7 +159,7 @@ export const duplicatesRouter = router({
       const phoneMatches = await db
         .select()
         .from(members)
-        .where(members.phone.inArray(phonesToFind));
+        .where(inArray(members.phone, phonesToFind));
       duplicateMembers = [
         ...duplicateMembers,
         ...phoneMatches.filter((m) => !duplicateMembers.find((d) => d.id === m.id)),

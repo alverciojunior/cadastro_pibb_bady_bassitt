@@ -54,7 +54,7 @@ export default function MembroEditar() {
   });
 
   const [formData, setFormData] = useState<any>({});
-  const [children, setChildren] = useState<{ fullName: string; birthDate: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
+  const [children, setChildren] = useState<{ fullName: string; birthDate: string; phone: string; isBaptized: boolean; baptismDate: string; ministry: string }[]>([]);
 
   useEffect(() => {
     if (member) {
