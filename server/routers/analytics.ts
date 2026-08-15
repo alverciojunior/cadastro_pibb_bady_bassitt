@@ -1,4 +1,4 @@
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, pibbAdminProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { members, memberChildren, families } from "../../drizzle/schema";
 import { eq, and, gte, lt, isNotNull } from "drizzle-orm";
@@ -8,7 +8,7 @@ export const analyticsRouter = router({
   /**
    * Crescimento mensal de famílias (últimos 12 meses)
    */
-  monthlyGrowth: protectedProcedure.query(async () => {
+  monthlyGrowth: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -47,7 +47,7 @@ export const analyticsRouter = router({
   /**
    * Distribuição por ministério (inclui titular, cônjuge e filhos)
    */
-  ministryDistribution: protectedProcedure.query(async () => {
+  ministryDistribution: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -101,7 +101,7 @@ export const analyticsRouter = router({
   /**
    * Estatísticas gerais de crescimento (baseado em famílias)
    */
-  growthStats: protectedProcedure.query(async () => {
+  growthStats: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -147,7 +147,7 @@ export const analyticsRouter = router({
   /**
    * Distribuição por situação (Ativo, Frequentante, Visitante, Afastado)
    */
-  statusDistribution: protectedProcedure.query(async () => {
+  statusDistribution: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
@@ -190,7 +190,7 @@ export const analyticsRouter = router({
   /**
    * Top ministérios (5 maiores, inclui titular, cônjuge e filhos)
    */
-  topMinistries: protectedProcedure.query(async () => {
+  topMinistries: pibbAdminProcedure.query(async () => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 

@@ -177,3 +177,4 @@
 - [x] Corrigir a política de cookie usando HTTPS detectado no preview
 - [x] Verificar saúde do servidor e salvar checkpoint da correção
 - [x] Corrigir a persistência da sessão e o redirecionamento para /dashboard após login válido
+- [x] Corrigir bloqueio de acesso à rota /analytics após login administrativo
