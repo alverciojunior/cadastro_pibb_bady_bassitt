@@ -1,7 +1,7 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
-import { verifyAdminToken } from "../routers/adminAuth";
+import { getAdminTokenFromRequest, verifyAdminToken } from "../routers/adminAuth";
 
 export type AdminSession = { id: number; username: string };
 
@@ -11,8 +11,6 @@ export type TrpcContext = {
   user: User | null;
   admin: AdminSession | null;
 };
-
-const ADMIN_COOKIE = "pibb_admin_session";
 
 export async function createContext(
   opts: CreateExpressContextOptions
@@ -26,9 +24,9 @@ export async function createContext(
     user = null;
   }
 
-  // Verificar sessão do admin próprio (cookie pibb_admin_session)
+  // Verificar sessão do admin próprio via cookie ou header Authorization.
   try {
-    const adminToken = opts.req.cookies?.[ADMIN_COOKIE];
+    const adminToken = getAdminTokenFromRequest(opts.req);
     if (adminToken) {
       const payload = await verifyAdminToken(adminToken);
       if (payload) {

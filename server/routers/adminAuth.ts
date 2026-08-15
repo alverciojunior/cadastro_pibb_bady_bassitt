@@ -11,6 +11,16 @@ import { ENV } from "../_core/env";
 const ADMIN_COOKIE = "pibb_admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 8 * 1000; // 8 horas em milissegundos (Express usa ms)
 
+export function getAdminTokenFromRequest(req: any): string | null {
+  const authorization = req.headers?.authorization;
+  if (typeof authorization === "string" && authorization.startsWith("Bearer ")) {
+    const token = authorization.slice("Bearer ".length).trim();
+    if (token) return token;
+  }
+
+  return req.cookies?.[ADMIN_COOKIE] ?? null;
+}
+
 function isSecureRequest(req: any): boolean {
   if (req.protocol === "https") return true;
   const fwd = req.headers["x-forwarded-proto"];
@@ -82,7 +92,7 @@ export const adminAuthRouter = router({
       const cookieOptions = getAdminCookieOptions(ctx.req);
       ctx.res.cookie(ADMIN_COOKIE, token, cookieOptions);
 
-      return { success: true, name: admin.name, username: admin.username };
+      return { success: true, name: admin.name, username: admin.username, token };
     }),
 
   // Logout
@@ -94,7 +104,7 @@ export const adminAuthRouter = router({
 
   // Verificar sessão atual
   me: publicProcedure.query(async ({ ctx }) => {
-    const token = ctx.req.cookies?.[ADMIN_COOKIE];
+    const token = getAdminTokenFromRequest(ctx.req);
     if (!token) return null;
 
     const payload = await verifyAdminToken(token);
@@ -118,7 +128,7 @@ export const adminAuthRouter = router({
   changePassword: publicProcedure
     .input(z.object({ currentPassword: z.string().min(1), newPassword: z.string().min(6, "Mínimo 6 caracteres") }))
     .mutation(async ({ input, ctx }) => {
-      const token = ctx.req.cookies?.[ADMIN_COOKIE];
+      const token = getAdminTokenFromRequest(ctx.req);
       if (!token) throw new TRPCError({ code: "UNAUTHORIZED" });
 
       const payload = await verifyAdminToken(token);

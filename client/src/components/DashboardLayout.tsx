@@ -25,6 +25,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { trpc } from "@/lib/trpc";
+import { ADMIN_SESSION_TOKEN_KEY } from "@/lib/adminSession";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -87,7 +88,10 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { data: adminUser } = trpc.adminAuth.me.useQuery(undefined, { retry: false });
   const logoutMutation = trpc.adminAuth.logout.useMutation({
-    onSuccess: () => { window.location.href = "/admin/login"; },
+    onSuccess: () => {
+      window.sessionStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
+      window.location.replace("/admin/login");
+    },
   });
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();

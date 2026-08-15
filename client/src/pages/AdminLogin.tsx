@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
+import { ADMIN_SESSION_TOKEN_KEY } from "@/lib/adminSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,12 +38,15 @@ export default function AdminLogin() {
   const loginMutation = trpc.adminAuth.login.useMutation({
     onSuccess: async (data) => {
       toast.success(`Bem-vindo(a), ${data.name}!`);
-      // Invalidar o cache da query me para forçar uma nova verificação
-      await utils.adminAuth.me.invalidate();
-      // Aguardar um pouco para garantir que o cookie foi definido
-      setTimeout(() => {
+      window.sessionStorage.setItem(ADMIN_SESSION_TOKEN_KEY, data.token);
+
+      try {
+        await utils.adminAuth.me.fetch();
         navigate("/dashboard");
-      }, 500);
+      } catch {
+        window.sessionStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
+        setError("Não foi possível confirmar sua sessão. Tente novamente.");
+      }
     },
     onError: (err) => {
       setError(err.message || "Usuário ou senha inválidos");
