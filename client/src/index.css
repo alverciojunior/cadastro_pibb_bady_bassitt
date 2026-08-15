@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Google Fonts - Lato (corpo) + Merriweather (títulos) */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
+@theme inline {
+  /* PIBB Color Palette - Azul escuro + dourado/âmbar */
+  --color-background: oklch(0.98 0.005 240);
+  --color-foreground: oklch(0.15 0.02 240);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.15 0.02 240);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.15 0.02 240);
+
+  /* Primary - Azul PIBB */
+  --color-primary: oklch(0.32 0.09 250);
+  --color-primary-foreground: oklch(0.98 0.005 240);
+
+  /* Secondary - Dourado/Âmbar */
+  --color-secondary: oklch(0.78 0.13 75);
+  --color-secondary-foreground: oklch(0.15 0.02 240);
+
+  --color-muted: oklch(0.94 0.01 240);
+  --color-muted-foreground: oklch(0.45 0.03 240);
+  --color-accent: oklch(0.94 0.03 250);
+  --color-accent-foreground: oklch(0.32 0.09 250);
+  --color-destructive: oklch(0.55 0.2 25);
+  --color-destructive-foreground: oklch(0.98 0 0);
+  --color-border: oklch(0.88 0.01 240);
+  --color-input: oklch(0.88 0.01 240);
+  --color-ring: oklch(0.32 0.09 250);
+
+  /* Chart colors */
+  --color-chart-1: oklch(0.32 0.09 250);
+  --color-chart-2: oklch(0.78 0.13 75);
+  --color-chart-3: oklch(0.55 0.12 160);
+  --color-chart-4: oklch(0.65 0.15 30);
+  --color-chart-5: oklch(0.60 0.14 300);
+
+  --radius: 0.625rem;
+  --font-sans: 'Lato', system-ui, sans-serif;
+  --font-serif: 'Merriweather', Georgia, serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  /* Acessibilidade para idosos - fontes maiores */
+  h1 { @apply text-3xl font-serif font-bold; }
+  h2 { @apply text-2xl font-serif font-bold; }
+  h3 { @apply text-xl font-serif font-semibold; }
+  h4 { @apply text-lg font-semibold; }
+
+  /* Botões maiores e mais acessíveis */
+  button, [role="button"] {
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  /* Inputs maiores */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Links visíveis */
+  a {
+    @apply text-primary underline-offset-4;
+  }
+}
+
+/* Container customizado */
+.container {
+  @apply mx-auto px-4;
+  max-width: 1200px;
+}
+
+/* Flex defaults */
+.flex {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Animações de transição de etapas do formulário */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.step-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.step-enter-back {
+  animation: slideInLeft 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Gradiente da identidade da igreja */
+.church-gradient {
+  background: linear-gradient(135deg, oklch(0.32 0.09 250) 0%, oklch(0.25 0.07 250) 100%);
+}
+
+.gold-accent {
+  color: oklch(0.65 0.15 75);
+}
+
+/* Card de formulário */
+.form-card {
+  @apply bg-card rounded-2xl shadow-lg border border-border/50;
+}
+
+/* Barra de progresso */
+.progress-step {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300;
+}
+
+.progress-step.active {
+  @apply bg-primary text-primary-foreground shadow-md;
+}
+
+.progress-step.completed {
+  @apply bg-secondary text-secondary-foreground;
+}
+
+.progress-step.pending {
+  @apply bg-muted text-muted-foreground;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: oklch(0.95 0 0); }
+::-webkit-scrollbar-thumb { background: oklch(0.70 0.05 240); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(0.50 0.07 240); }

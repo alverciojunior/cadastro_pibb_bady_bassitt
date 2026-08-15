@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1779731827976,
+      "tag": "0000_giant_swarm",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779731972232,
+      "tag": "0001_fancy_war_machine",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779738374286,
+      "tag": "0002_heavy_maddog",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1779742831544,
+      "tag": "0003_wealthy_red_wolf",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1779800522999,
+      "tag": "0004_wooden_wrecker",
+      "breakpoints": true
+    }
+  ]
+}
