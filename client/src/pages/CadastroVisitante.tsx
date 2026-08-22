@@ -95,7 +95,7 @@ export default function CadastroVisitante() {
             <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
               <Heart className="h-5 w-5" aria-hidden="true" />
             </div>
-            <CardTitle className="mt-3 font-serif text-2xl">Registrar minha visita</CardTitle>
+            <CardTitle className="mt-3 font-serif text-2xl">Registrar um Visitante</CardTitle>
             <CardDescription className="text-blue-100">
               Conte-nos apenas o essencial para que possamos acolher você.
             </CardDescription>
@@ -141,12 +141,12 @@ export default function CadastroVisitante() {
               </div>
 
               <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-relaxed text-blue-950">
-                Seus dados serão registrados como <strong>Família Visitante</strong>. Outros dados podem ser completados pela equipe administrativa posteriormente.
+                Os dados registrados do visitante para contato e acolhimento, os dados serão atualizados posteriormente pela equipe de acolhimento da PIB Bady.
               </div>
 
               <Button type="submit" className="h-13 w-full gap-2 text-base font-semibold bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={createVisitor.isPending}>
                 {createVisitor.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardPenLine className="h-5 w-5" />}
-                {createVisitor.isPending ? "Registrando visita..." : "Registrar visita"}
+                {createVisitor.isPending ? "Registrando visita..." : "Registrar visitante"}
               </Button>
             </form>
           </CardContent>

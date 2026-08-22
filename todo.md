@@ -186,3 +186,7 @@
 - [x] Registrar a rota pública e o atalho de acesso na página inicial
 - [x] Validar que o visitante pode ter seus dados complementados na edição administrativa
 - [x] Adicionar e executar testes automatizados para o fluxo de visitante
+
+## Revisão de Texto — Cadastro de Visitantes
+- [x] Verificar os textos atualizados e salvar novo checkpoint
+- [x] Salvar um novo checkpoint após a revisão de texto do formulário /cadastrovisitante
