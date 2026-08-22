@@ -155,7 +155,7 @@ export default function CadastroVisitante() {
                   placeholder="Conte algo que seja importante para a equipe de acolhimento saber."
                   {...form.register("pastoralNotes")}
                 />
-                <p className="text-xs text-muted-foreground">Essas informações serão registradas nas observações pastorais.</p>
+                <p className="text-xs text-muted-foreground"></p>
                 {form.formState.errors.pastoralNotes && <p className="text-sm text-destructive">{form.formState.errors.pastoralNotes.message}</p>}
               </div>
 
