@@ -1,6 +1,6 @@
-# Web App Template (tRPC + Manus Auth + Database)
+# Web App Template (tRPC + Auth + Database)
 
-This template gives you a React 19 + Tailwind 4 + Express 4 + tRPC 11 stack with Manus OAuth already wired. Procedures are your contracts, types flow end to end, and authentication "just works".
+This template gives you a React 19 + Tailwind 4 + Express 4 + tRPC 11 stack with app OAuth already wired. Procedures are your contracts, types flow end to end, and authentication "just works".
 
 ---
 
@@ -8,7 +8,7 @@ This template gives you a React 19 + Tailwind 4 + Express 4 + tRPC 11 stack with
 
 - **tRPC-first:** define procedures in `server/routers.ts`, consume them with `trpc.*` hooks.
 - **Superjson out of the box:** return Drizzle rows directly—`Date` stays a `Date`.
-- **Auth baked in:** `/api/oauth/callback` handles Manus OAuth, `protectedProcedure` injects `ctx.user`.
+- **Auth baked in:** `/api/oauth/callback` handles app OAuth, `protectedProcedure` injects `ctx.user`.
 - **Gateway-ready:** all RPC traffic is under `/api/trpc`, making it easy to route at the edge.
 
 ---
@@ -70,8 +70,8 @@ Only touch the files under "←" markers. Anything under `server/_core` or other
 **DO NOT** store images, videos, or large assets in `client/public/` or `client/src/assets/`. Local media files will cause deployment timeouts.
 
 **Required workflow:**
-1. Upload assets using the CLI: `manus-upload-file --webdev path/to/image.png`
-2. Use the returned storage path directly in your code: `<img src="/manus-storage/image_a1b2c3d4.png" />`
+1. Upload assets using the CLI: `app-upload-file --webdev path/to/image.png`
+2. Use the returned storage path directly in your code: `<img src="/app-storage/image_a1b2c3d4.png" />`
 3. Store the original local file in `/home/ubuntu/webdev-static-assets/` (outside the project directory)
 
 Only small configuration files like `favicon.ico`, `robots.txt`, and `manifest.json` belong in `client/public/`.
@@ -82,7 +82,7 @@ Files in `client/public` are available at the root of your site—reference them
 
 ## Authentication Flow
 
-- Manus OAuth completes at `/api/oauth/callback` and drops a session cookie.
+- app OAuth completes at `/api/oauth/callback` and drops a session cookie.
 - Each request to `/api/trpc` builds context via `server/_core/context.ts`, making the current user available as `ctx.user`.
 - Wrap protected logic in `protectedProcedure`; public access uses `publicProcedure`.
 - Frontend reads auth state with `trpc.auth.me.useQuery()` and invokes `trpc.auth.logout.useMutation()`—no cookie plumbing required.
@@ -94,14 +94,14 @@ Files in `client/public` are available at the root of your site—reference them
 Available pre-defined system envs:
 - `DATABASE_URL`: MySQL/TiDB connection string
 - `JWT_SECRET`: Session cookie signing secret
-- `VITE_APP_ID`: Manus OAuth application ID
-- `OAUTH_SERVER_URL`: Manus OAuth backend base URL
-- `VITE_OAUTH_PORTAL_URL`: Manus login portal URL (frontend)
+- `VITE_APP_ID`: app OAuth application ID
+- `OAUTH_SERVER_URL`: app OAuth backend base URL
+- `VITE_OAUTH_PORTAL_URL`: app login portal URL (frontend)
 - `OWNER_OPEN_ID`, `OWNER_NAME`: Owner's info
-- `BUILT_IN_FORGE_API_URL`: Manus built-in apis (includes llm, storage, data_api, notification, etc...)
-- `BUILT_IN_FORGE_API_KEY`: Bearer token used by Manus built-in apis (server-side)
-- `VITE_FRONTEND_FORGE_API_KEY`: Bearer token for frontend access to Manus built-in apis
-- `VITE_FRONTEND_FORGE_API_URL`: Manus built-in apis URL for frontend
+- `BUILT_IN_FORGE_API_URL`: app built-in apis (includes llm, storage, data_api, notification, etc...)
+- `BUILT_IN_FORGE_API_KEY`: Bearer token used by app built-in apis (server-side)
+- `VITE_FRONTEND_FORGE_API_KEY`: Bearer token for frontend access to app built-in apis
+- `VITE_FRONTEND_FORGE_API_URL`: app built-in apis URL for frontend
 
 Do not edit these directly in code or commit `.env` files.
 The envs above are system envs, when use env in website code, refer `server/_core/env.ts` for available list.
@@ -403,7 +403,7 @@ Tips
 
 ## ☁️ File Storage
 
-Use the preconfigured storage helpers in `server/storage.ts`. Credentials are injected from the platform (no manual setup required). Files are stored securely and served via the built-in `/manus-storage/` path — no manual URL management needed.
+Use the preconfigured storage helpers in `server/storage.ts`. Credentials are injected from the platform (no manual setup required). Files are stored securely and served via the built-in `/app-storage/` path — no manual URL management needed.
 
 ```ts
 import { storagePut } from "./server/storage";
@@ -415,21 +415,21 @@ const { key, url } = await storagePut(
   fileBuffer, // Buffer | Uint8Array | string
   "image/png"
 );
-// url = "/manus-storage/{key}" — use directly in frontend code
+// url = "/app-storage/{key}" — use directly in frontend code
 // key = unique storage key — save in database
 ```
 
 Tips
 - Save the `key` or `url` in your database; use storage for the actual file bytes. This applies to all files including images, documents, and media.
 - For file uploads, have the client POST to your server, then call `storagePut` from your backend.
-- The returned `url` (e.g. `/manus-storage/...`) is automatically served via signed redirect — no manual URL signing needed.
+- The returned `url` (e.g. `/app-storage/...`) is automatically served via signed redirect — no manual URL signing needed.
 - To delete a file, drop its `key` from your DB and any UI references — the key is the only way to reach the object, so an unreferenced file is effectively gone. Do not implement a helper to remove the underlying object; the template's storage layer does not expose a delete endpoint.
 
 ---
 
 ## 🗺️ Maps Integration
 
-**CRITICAL: The Manus proxy provides FULL access to ALL Google Maps features** - including advanced drawing, heatmaps, Street View, all layers, Places API, etc. Do ask users for Google Map API keys - authentication is automatic.
+**CRITICAL: The app proxy provides FULL access to ALL Google Maps features** - including advanced drawing, heatmaps, Street View, all layers, Places API, etc. Do ask users for Google Map API keys - authentication is automatic.
 
 **Default: Use Frontend SDK** - Import MapView from `client/src/components/Map.tsx` and initialize ANY Google Maps service (geocoding, directions, places, drawing, visualization, geometry, etc.) in the onMapReady callback. 
 
@@ -442,20 +442,20 @@ Tips
 - Frontend: See `client/src/components/Map.tsx` for component usage - ALL Google Maps JavaScript API features work
 - Backend: Create tRPC procedures using `makeRequest` from `server/_core/map.ts`
 
-NEVER use external map libraries or request API keys from users - the Manus proxy handles everything automatically with no feature limitations.
+NEVER use external map libraries or request API keys from users - the app proxy handles everything automatically with no feature limitations.
 
 
 ---
 
 ## ☁️ Data API
 
-When you need external data, use the omni_search with search_type = 'api' to see there's any built-in api available in Manus API Hub access. You only have to connect other api if there's no suitable built-in api available.
+When you need external data, use the omni_search with search_type = 'api' to see there's any built-in api available in app API Hub access. You only have to connect other api if there's no suitable built-in api available.
 
 ---
 
 ## Owner Notifications
 
-This template already ships with a `notifyOwner({ title, content })` helper (`server/_core/notification.ts`) and a protected tRPC mutation at `trpc.system.notifyOwner`. Use it whenever backend logic needs to push an operational update to the Manus project owner—common triggers are new form submissions, survey feedback, or workflow results.
+This template already ships with a `notifyOwner({ title, content })` helper (`server/_core/notification.ts`) and a protected tRPC mutation at `trpc.system.notifyOwner`. Use it whenever backend logic needs to push an operational update to the app project owner—common triggers are new form submissions, survey feedback, or workflow results.
 
 1. On the server, call `await notifyOwner({ title, content })` or reuse the provided `system.notifyOwner` mutation from jobs/webhooks (`trpc.system.notifyOwner.useMutation()` on the client).
 2. Handle the boolean return (`true` on success, `false` if the upstream service is temporarily unavailable) to decide whether you need a fallback channel.
@@ -586,7 +586,7 @@ Note: All TODO comments are remarks for the agent (you), not for the user.
     "tw-animate-css": "^1.4.0",
     "typescript": "5.9.3",
     "vite": "^7.1.7",
-    "vite-plugin-manus-runtime": "^0.0.57",
+    "vite-plugin-app-runtime": "^0.0.57",
     "vitest": "^2.1.4"
   },
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
@@ -616,7 +616,7 @@ export const users = mysqlTable("users", {
    * Use this for relations between tables.
    */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
+  /** app OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -872,7 +872,7 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
     openId: "sample-user",
     email: "sample@example.com",
     name: "Sample User",
-    loginMethod: "manus",
+    loginMethod: "app",
     role: "user",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -1012,7 +1012,7 @@ Use `storagePut()` to upload files (see S3 File Storage section).
 
 ---
 
-## Manus OAuth Best Practices
+## OAuth Best Practices
 
 **Key Rule:** Always use `window.location.origin` for redirect URLs—never hardcode domains or use `req.host`. Frontend and backend run on separate servers, so the frontend must pass its origin explicitly.
 
@@ -1021,7 +1021,7 @@ Use `storagePut()` to upload files (see S3 File Storage section).
 **Anti-patterns:**
 ```ts
 // ❌ Never construct URLs from env vars or patterns
-const url = `https://${projectName}.manus.space/callback`;
+const url = `https://${projectName}.app.space/callback`;
 const url = `https://${process.env.APP_SUBDOMAIN}.example.com/verify`;
 ```
 
