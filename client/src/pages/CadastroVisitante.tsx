@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 const LOGO_URL = "/manus-storage/pibb_logo_977c9cca.png";
@@ -19,6 +20,7 @@ const visitorSchema = z.object({
   phone: z
     .string()
     .refine((value) => value.replace(/\D/g, "").length >= 10, "Informe um telefone válido com DDD."),
+  pastoralNotes: z.string().trim().max(2_000, "As observações podem ter no máximo 2.000 caracteres."),
 });
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
@@ -29,7 +31,7 @@ export default function CadastroVisitante() {
 
   const form = useForm<VisitorFormData>({
     resolver: zodResolver(visitorSchema),
-    defaultValues: { fullName: "", phone: "" },
+    defaultValues: { fullName: "", phone: "", pastoralNotes: "" },
   });
 
   const createVisitor = trpc.members.createVisitor.useMutation({
@@ -46,6 +48,7 @@ export default function CadastroVisitante() {
     createVisitor.mutate({
       fullName: data.fullName.trim(),
       phone: data.phone,
+      pastoralNotes: data.pastoralNotes.trim(),
     });
   };
 
@@ -138,6 +141,22 @@ export default function CadastroVisitante() {
                   />
                 </div>
                 {form.formState.errors.phone && <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="visitor-notes" className="text-base font-semibold">
+                  Observações <span className="text-sm font-normal text-muted-foreground">(opcional)</span>
+                </Label>
+                <Textarea
+                  id="visitor-notes"
+                  rows={4}
+                  maxLength={2000}
+                  className="resize-y text-base"
+                  placeholder="Conte algo que seja importante para a equipe de acolhimento saber."
+                  {...form.register("pastoralNotes")}
+                />
+                <p className="text-xs text-muted-foreground">Essas informações serão registradas nas observações pastorais.</p>
+                {form.formState.errors.pastoralNotes && <p className="text-sm text-destructive">{form.formState.errors.pastoralNotes.message}</p>}
               </div>
 
               <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-relaxed text-blue-950">

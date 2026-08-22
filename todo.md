@@ -5,6 +5,7 @@ Este arquivo registra apenas as **funcionalidades principais** do Sistema de Ges
 ## Cadastro e Gestão de Membros
 - [x] Cadastro público de membros e famílias com formulário em múltiplas etapas
 - [x] Cadastro simplificado de visitantes, com nome e telefone
+- [x] Campo de observações no cadastro de visitantes, salvo em Observações Pastorais
 - [x] Classificação de membros, frequentantes, visitantes e afastados
 - [x] Consulta, busca, edição e exclusão de cadastros pelo painel administrativo
 - [x] Histórico de alterações e prevenção de cadastros duplicados

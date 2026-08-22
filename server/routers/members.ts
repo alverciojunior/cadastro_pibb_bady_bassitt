@@ -93,6 +93,12 @@ export const visitorInputSchema = z.object({
       (value) => value.replace(/\D/g, "").length >= 10,
       "Informe um telefone válido com DDD"
     ),
+  pastoralNotes: z
+    .string()
+    .trim()
+    .max(2_000, "As observações podem ter no máximo 2.000 caracteres")
+    .optional()
+    .transform((value) => value || null),
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -141,6 +147,7 @@ export const membersRouter = router({
 
     const fullName = input.fullName.trim();
     const phone = input.phone.trim();
+    const pastoralNotes = input.pastoralNotes;
     const isDuplicate = await checkDuplicate(db, null, phone);
 
     const familyCode = `FAM-${nanoid(8).toUpperCase()}`;
@@ -161,6 +168,7 @@ export const membersRouter = router({
       phone,
       whatsapp: phone,
       memberType: "visitante",
+      pastoralNotes,
       hasDuplicate: isDuplicate,
     });
 

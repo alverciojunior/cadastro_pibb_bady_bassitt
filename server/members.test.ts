@@ -102,12 +102,24 @@ describe("visitorInputSchema", () => {
     const result = visitorInputSchema.parse({
       fullName: "Visitante de Teste",
       phone: "(17) 99999-9999",
+      pastoralNotes: "Prefere conversar após o culto.",
     });
 
     expect(result).toEqual({
       fullName: "Visitante de Teste",
       phone: "(17) 99999-9999",
+      pastoralNotes: "Prefere conversar após o culto.",
     });
+  });
+
+  it("normaliza observações vazias para não preencher Observações Pastorais", () => {
+    const result = visitorInputSchema.parse({
+      fullName: "Visitante de Teste",
+      phone: "(17) 99999-9999",
+      pastoralNotes: "   ",
+    });
+
+    expect(result.pastoralNotes).toBeNull();
   });
 
   it("rejects visitor registration without a valid phone number", () => {
