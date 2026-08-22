@@ -10,6 +10,8 @@ import { invokeLLM } from "../_core/llm";
 import { sendWhatsAppMessage } from "./whatsapp";
 import { sendNewRegistrationEmailAlert } from "../emailAlertService";
 
+export const PASTORAL_SUGGESTIONS_MODEL = "gemini-3-flash-preview";
+
 // ─── Zod Schemas ─────────────────────────────────────────────────────────────
 
 const childSchema = z.object({
@@ -609,6 +611,7 @@ Gere:
 Seja acolhedor, respeitoso e prático. Máximo 300 palavras.`;
 
       const response = await invokeLLM({
+        model: PASTORAL_SUGGESTIONS_MODEL,
         messages: [
           { role: "system", content: "Você é um assistente pastoral de uma igreja batista brasileira." },
           { role: "user", content: prompt },

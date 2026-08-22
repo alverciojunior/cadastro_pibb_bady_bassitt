@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { visitorInputSchema } from "./routers/members";
+import { PASTORAL_SUGGESTIONS_MODEL, visitorInputSchema } from "./routers/members";
 
 // Mock DB
 vi.mock("./db", () => ({
@@ -186,5 +186,11 @@ describe("member classification logic", () => {
     for (const tc of testCases) {
       expect(classify(tc.freq, tc.baptized)).toBe(tc.expected);
     }
+  });
+});
+
+describe("sugestões pastorais por IA", () => {
+  it("usa o Gemini 3 Flash Preview", () => {
+    expect(PASTORAL_SUGGESTIONS_MODEL).toBe("gemini-3-flash-preview");
   });
 });

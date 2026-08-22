@@ -19,6 +19,7 @@ Este arquivo registra apenas as **funcionalidades principais** do Sistema de Ges
 - [x] Notificações para a liderança sobre novos cadastros e atualizações
 - [x] Integração de mensagens via WhatsApp e histórico de envios
 - [x] Avisos automáticos de aniversariantes para a liderança
+- [x] Sugestões pastorais por IA atualizadas para Gemini 3 Flash Preview
 - [x] Alertas por e-mail ao pastor e à liderança para cada novo membro ou visitante cadastrado
 - [x] Tela administrativa para configurar os destinatários dos alertas por e-mail
 - [x] Configuração do serviço de envio para os alertas por e-mail
