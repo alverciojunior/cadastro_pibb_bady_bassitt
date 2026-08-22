@@ -87,7 +87,7 @@ export default function Home() {
       <section className="bg-white py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <h3 className="text-2xl font-serif font-bold text-center text-primary mb-8">
-            Por que atualizar seu cadastro?
+            Por que fazemos o seu cadastro?
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
