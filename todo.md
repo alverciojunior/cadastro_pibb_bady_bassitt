@@ -192,3 +192,4 @@
 - [x] Salvar um novo checkpoint após a revisão de texto do formulário /cadastrovisitante
 - [x] Verificar o texto do botão da página inicial e salvar novo checkpoint
 - [x] Salvar um novo checkpoint após a revisão do botão “Registrar um Visitante”
+- [x] Verificar o texto do botão “Registrar um Membro” e salvar novo checkpoint

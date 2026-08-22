@@ -63,7 +63,7 @@ export default function Home() {
                 className="h-16 px-8 text-lg font-semibold bg-secondary hover:bg-secondary/90 text-secondary-foreground gap-3 w-full sm:w-auto shadow-lg"
               >
                 <ClipboardList size={22} />
-                Fazer meu Cadastro
+                Registrar um Membro
                 <ArrowRight size={18} />
               </Button>
             </Link>
