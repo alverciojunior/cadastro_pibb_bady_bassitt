@@ -68,6 +68,17 @@ export default function Home() {
               </Button>
             </Link>
 
+            <Link href="/cadastrovisitante">
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-16 px-8 text-lg font-semibold gap-3 w-full sm:w-auto border-primary/25 bg-white text-primary hover:bg-primary/5"
+              >
+                <Heart size={22} />
+                Registrar uma Visita
+              </Button>
+            </Link>
+
           </div>
         </div>
       </section>

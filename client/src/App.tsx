@@ -21,6 +21,7 @@ import Exportacao from "./pages/Exportacao";
 import Importacao from "./pages/Importacao";
 import DadosInvalidos from "./pages/DadosInvalidos";
 import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
+import CadastroVisitante from "./pages/CadastroVisitante";
 
 // Wrapper para rotas protegidas pelo AdminGuard
 function ProtectedDashboard() {
@@ -69,6 +70,7 @@ function Router() {
       {/* Rotas públicas */}
       <Route path="/" component={Home} />
       <Route path="/cadastro" component={CadastroForm} />
+      <Route path="/cadastrovisitante" component={CadastroVisitante} />
       <Route path="/admin/login" component={AdminLogin} />
 
       {/* Rotas protegidas — exigem login de administrador */}

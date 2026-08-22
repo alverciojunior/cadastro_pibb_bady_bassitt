@@ -178,3 +178,11 @@
 - [x] Verificar saúde do servidor e salvar checkpoint da correção
 - [x] Corrigir a persistência da sessão e o redirecionamento para /dashboard após login válido
 - [x] Corrigir bloqueio de acesso à rota /analytics após login administrativo
+
+## Cadastro de Visitantes
+- [x] Criar procedimento público para registrar visitante com nome e telefone no banco existente
+- [x] Criar família e membro com categoria inicial Família Visitante
+- [x] Criar página pública /cadastrovisitante com formulário simplificado e confirmação
+- [x] Registrar a rota pública e o atalho de acesso na página inicial
+- [x] Validar que o visitante pode ter seus dados complementados na edição administrativa
+- [x] Adicionar e executar testes automatizados para o fluxo de visitante

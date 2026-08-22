@@ -83,6 +83,17 @@ export const memberInputSchema = z.object({
   pastoralNotes: z.string().optional().nullable(),
 });
 
+export const visitorInputSchema = z.object({
+  fullName: z.string().trim().min(2, "Nome é obrigatório").max(180),
+  phone: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value.replace(/\D/g, "").length >= 10,
+      "Informe um telefone válido com DDD"
+    ),
+});
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function classifyMember(data: {
@@ -122,6 +133,66 @@ async function checkDuplicate(
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 export const membersRouter = router({
+  // Cadastro público e simplificado de visitante
+  createVisitor: publicProcedure.input(visitorInputSchema).mutation(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB indisponível" });
+
+    const fullName = input.fullName.trim();
+    const phone = input.phone.trim();
+    const isDuplicate = await checkDuplicate(db, null, phone);
+
+    const familyCode = `FAM-${nanoid(8).toUpperCase()}`;
+    await db.insert(families).values({ familyCode });
+    const [family] = await db
+      .select()
+      .from(families)
+      .where(eq(families.familyCode, familyCode))
+      .limit(1);
+
+    if (!family) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Não foi possível criar a família" });
+    }
+
+    await db.insert(members).values({
+      familyId: family.id,
+      fullName,
+      phone,
+      whatsapp: phone,
+      memberType: "visitante",
+      hasDuplicate: isDuplicate,
+    });
+
+    const [visitor] = await db
+      .select()
+      .from(members)
+      .where(eq(members.familyId, family.id))
+      .limit(1);
+
+    if (!visitor) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Não foi possível criar o visitante" });
+    }
+
+    await db.insert(memberUpdates).values({
+      memberId: visitor.id,
+      changeType: "create",
+      changeDescription: `Cadastro simplificado de visitante: ${fullName}`,
+    });
+
+    await notifyOwner({
+      title: `Novo visitante: ${fullName}`,
+      content: `Um visitante foi cadastrado pelo formulário simplificado.\n\n• Nome: ${fullName}\n• Telefone: ${phone}\n• Código da Família: ${familyCode}${isDuplicate ? "\n\n⚠️ ATENÇÃO: Possível duplicidade detectada pelo telefone." : ""}`,
+    });
+
+    return {
+      success: true,
+      memberId: visitor.id,
+      familyCode,
+      memberType: "visitante" as const,
+      isDuplicate,
+    };
+  }),
+
   // Criar membro (público - formulário de cadastro)
   create: publicProcedure.input(memberInputSchema).mutation(async ({ input, ctx }) => {
     const db = await getDb();

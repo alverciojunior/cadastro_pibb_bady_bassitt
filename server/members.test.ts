@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+import { visitorInputSchema } from "./routers/members";
 
 // Mock DB
 vi.mock("./db", () => ({
@@ -92,6 +93,39 @@ describe("members.checkDuplicate", () => {
 
     const result = await caller.members.checkDuplicate({});
     expect(result).toEqual({ isDuplicate: false });
+  });
+});
+
+describe("visitorInputSchema", () => {
+  it("accepts a visitor name and Brazilian phone number", () => {
+    const result = visitorInputSchema.parse({
+      fullName: "Visitante de Teste",
+      phone: "(17) 99999-9999",
+    });
+
+    expect(result).toEqual({
+      fullName: "Visitante de Teste",
+      phone: "(17) 99999-9999",
+    });
+  });
+
+  it("rejects visitor registration without a valid phone number", () => {
+    expect(() =>
+      visitorInputSchema.parse({ fullName: "Visitante de Teste", phone: "123" })
+    ).toThrow("Informe um telefone válido com DDD");
+  });
+});
+
+describe("members.createVisitor", () => {
+  it("is publicly callable and reports when the database is unavailable", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+
+    await expect(
+      caller.members.createVisitor({
+        fullName: "Visitante de Teste",
+        phone: "(17) 99999-9999",
+      })
+    ).rejects.toThrow("DB indisponível");
   });
 });
 
