@@ -8,6 +8,7 @@ import { nanoid } from "nanoid";
 import { notifyOwner } from "../_core/notification";
 import { invokeLLM } from "../_core/llm";
 import { sendWhatsAppMessage } from "./whatsapp";
+import { sendNewRegistrationEmailAlert } from "../emailAlertService";
 
 // ─── Zod Schemas ─────────────────────────────────────────────────────────────
 
@@ -184,6 +185,12 @@ export const membersRouter = router({
       content: `Um visitante foi cadastrado pelo formulário simplificado.\n\n• Nome: ${fullName}\n• Telefone: ${phone}\n• Código da Família: ${familyCode}${isDuplicate ? "\n\n⚠️ ATENÇÃO: Possível duplicidade detectada pelo telefone." : ""}`,
     });
 
+    void sendNewRegistrationEmailAlert({
+      fullName,
+      memberType: "visitante",
+      familyCode,
+    });
+
     return {
       success: true,
       memberId: visitor.id,
@@ -305,6 +312,12 @@ export const membersRouter = router({
     await notifyOwner({
       title: `Novo cadastro: ${input.fullName}`,
       content: `Um novo cadastro foi realizado na plataforma PIB Bady Bassitt.\n\n• Nome: ${input.fullName}\n• Telefone: ${input.phone || "—"}\n• Congregação: ${input.congregation || "—"}\n• Ministério: ${input.ministry || "—"}\n• Classificação: ${memberType.replace("_", " ")}${spouseInfo}${childrenInfo}\n\n${isDuplicate ? "⚠️ ATENÇÃO: Possível duplicidade detectada (CPF ou telefone já cadastrado)." : ""}`,
+    });
+
+    void sendNewRegistrationEmailAlert({
+      fullName: input.fullName,
+      memberType,
+      familyCode,
     });
 
     // Enviar mensagem de boas-vindas via WhatsApp (não bloqueia o cadastro)

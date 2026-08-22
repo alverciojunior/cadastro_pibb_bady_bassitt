@@ -62,6 +62,24 @@ export const whatsappMessages = mysqlTable("whatsapp_messages", {
 export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
 export type InsertWhatsappMessage = typeof whatsappMessages.$inferInsert;
 
+// ─── Email alert recipients ───────────────────────────────────────────────────
+export const emailAlertSettings = mysqlTable("email_alert_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  primaryEmail: varchar("primaryEmail", { length: 320 }).notNull(),
+  optionalEmail1: varchar("optionalEmail1", { length: 320 }),
+  optionalEmail2: varchar("optionalEmail2", { length: 320 }),
+  optionalEmail3: varchar("optionalEmail3", { length: 320 }),
+  optionalEmail4: varchar("optionalEmail4", { length: 320 }),
+  emailFrom: varchar("emailFrom", { length: 320 }),
+  resendApiKeyEncrypted: text("resendApiKeyEncrypted"),
+  resendApiKeyIv: varchar("resendApiKeyIv", { length: 64 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmailAlertSettings = typeof emailAlertSettings.$inferSelect;
+export type InsertEmailAlertSettings = typeof emailAlertSettings.$inferInsert;
+
 // ─── Families ────────────────────────────────────────────────────────────────
 export const families = mysqlTable("families", {
   id: int("id").autoincrement().primaryKey(),

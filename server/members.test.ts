@@ -6,6 +6,7 @@ import { visitorInputSchema } from "./routers/members";
 // Mock DB
 vi.mock("./db", () => ({
   getDb: vi.fn().mockResolvedValue(null),
+  getEmailAlertDeliveryConfiguration: vi.fn().mockResolvedValue(null),
 }));
 
 // Mock notification

@@ -12,6 +12,7 @@ import { exportRouter } from "./routers/export";
 import { importRouter } from "./routers/import";
 import { duplicatesRouter } from "./routers/duplicates";
 import { analyticsRouter } from "./routers/analytics";
+import { emailAlertsRouter } from "./routers/emailAlerts";
 
 export const appRouter = router({
   system: systemRouter,
@@ -33,6 +34,7 @@ export const appRouter = router({
   import: importRouter,
   duplicates: duplicatesRouter,
   analytics: analyticsRouter,
+  emailAlerts: emailAlertsRouter,
 });
 
 export type AppRouter = typeof appRouter;

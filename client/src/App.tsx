@@ -22,6 +22,7 @@ import Importacao from "./pages/Importacao";
 import DadosInvalidos from "./pages/DadosInvalidos";
 import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
 import CadastroVisitante from "./pages/CadastroVisitante";
+import EmailAlertsConfig from "./pages/EmailAlertsConfig";
 
 // Wrapper para rotas protegidas pelo AdminGuard
 function ProtectedDashboard() {
@@ -63,6 +64,9 @@ function ProtectedDadosInvalidos() {
 function ProtectedAnalyticsDashboard() {
   return <AdminGuard><AnalyticsDashboard /></AdminGuard>;
 }
+function ProtectedEmailAlertsConfig() {
+  return <AdminGuard><EmailAlertsConfig /></AdminGuard>;
+}
 
 function Router() {
   return (
@@ -87,6 +91,7 @@ function Router() {
       <Route path="/whatsapp/historico" component={ProtectedWhatsappHistorico} />
       <Route path="/admin/usuarios" component={ProtectedAdminUsuarios} />
       <Route path="/analytics" component={ProtectedAnalyticsDashboard} />
+      <Route path="/alertas-email" component={ProtectedEmailAlertsConfig} />
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
